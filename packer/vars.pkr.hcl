@@ -36,7 +36,7 @@ variable "snapshot_name" {
 
 variable "snapshot_regions" {
   description = ""
-  type        = list(string) 
+  type        = list(string)
   default     = ["SYD1"]
 }
 

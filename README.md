@@ -27,12 +27,12 @@ Can I get this down with containerization and free tiers?
 ## next steps
 
 - use ansible to set up my ubuntu image with the following
+  - firewall rules (hbfw and nbfw)
   - nginx
   - systemd for missinglink & awardit
   - cron job to call the missinglink backend
   - postgres setup
   - certificates (letsencrypt)
-  - firewall rules (hbfw and nbfw)
-  - nodejs and .net installs
-  - configuring the swap
-  - s3 bucket backups for the db
+   - nodejs and .net installs
+  - configuring the swap (common)
+  - s3 bucket backups for the databases

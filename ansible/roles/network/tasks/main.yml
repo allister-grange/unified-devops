@@ -1,0 +1,4 @@
+# - name: Set up the networking on the host
+#   hosts: all
+#   become: yes
+#   tasks:
