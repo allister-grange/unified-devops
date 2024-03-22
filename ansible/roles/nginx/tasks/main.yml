@@ -1,0 +1,17 @@
+- name: Setup system with user and nginx
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install nginx with specific dpkg options
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: yes
+        dpkg_options: "force-confdef,force-confold,Lock::Timeout=-1"
+        force_apt_get: yes
+
+    - name: Ensure nginx is enabled and will start on boot
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: yes
+        state: started

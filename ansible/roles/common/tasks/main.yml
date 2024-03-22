@@ -1,0 +1,22 @@
+- name: Setup system with user and nginx
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add a specific group
+      ansible.builtin.group:
+        name: grangeal
+        gid: 1001
+        state: present
+
+    - name: Add a specific user with the created group
+      ansible.builtin.user:
+        name: grangeal
+        uid: 1001
+        group: 1001
+        createhome: no
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600 # Optionally, update the cache if it's older than an hour
+
