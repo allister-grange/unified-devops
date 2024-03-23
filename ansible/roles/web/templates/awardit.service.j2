@@ -1,0 +1,17 @@
+[Unit]
+Description=awardit
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/deployer/awardit_backend/AwardIt/api
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=3
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+StandardOutput=file:/var/log/awardit.std
+StandardError=file:/var/log/awardit.err
+
+[Install]
+WantedBy=multi-user.target

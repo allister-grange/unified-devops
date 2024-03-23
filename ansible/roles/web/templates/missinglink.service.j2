@@ -1,0 +1,16 @@
+[Unit]
+Description=MissingLink
+
+[Service]
+WorkingDirectory=/home/deployer/missinglink/backend/MissingLink.Api
+ExecStart=/usr/bin/dotnet /home/deployer/missinglink/backend/MissingLink.Api/bin/Release/net6.0/missinglink.dll
+Restart=always
+RestartSec=10  # Restart service after 10 seconds if the dotnet service crashes
+SyslogIdentifier=missinglink
+User=deployer
+Environment=ASPNETCORE_ENVIRONMENT=Production
+StandardOutput=file:/var/log/missinglink.std
+StandardError=file:/var/log/missinglink.err
+
+[Install]
+WantedBy=multi-user.target

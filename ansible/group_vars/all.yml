@@ -1,0 +1,5 @@
+missinglink_repo_url: https://github.com/allister-grange/missinglink.git
+missinglink_dest_path: /home/deployer/missinglink
+# todo verify
+awardit_repo_url: https://github.com/allister-grange/awardit.git
+awardit_dest_path: /home/deployer/awardit

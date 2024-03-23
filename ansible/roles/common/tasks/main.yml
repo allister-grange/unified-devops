@@ -21,6 +21,7 @@
     name:
       - fail2ban
       - curl
+      - git
       - jq
       - tmux
     state: present

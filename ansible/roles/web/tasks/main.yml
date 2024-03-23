@@ -1,0 +1,50 @@
+- name: add .net package signing keys
+  ansible.builtin.shell:
+    cmd: |
+      wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb &&
+      sudo dpkg -i packages-microsoft-prod.deb &&
+      rm packages-microsoft-prod.deb &&
+      sudo apt-get update
+
+- name: install nodejs & .net
+  ansible.builtin.apt:
+    name:
+      - nodejs
+      - dotnet-sdk-6.0
+    state: present
+
+- name: clone down missinglink
+  ansible.builtin.git:
+    repo: "{{ missinglink_repo_url }}"
+    dest: "{{ missinglink_dest_path}}"
+    clone: yes
+    update: yes
+
+- name: build missinglink
+  ansible.builtin.shell:
+    cmd: 'cd /home/deployer/missinglink/backend/MissingLink.Api/ && dotnet publish -c "Release"'
+
+- name: setup systemd file for missinglink
+  ansible.builtin.template:
+    src: missinglink.service.j2
+    dest: /etc/systemd/system/missinglink.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: enable missinglink in systemd
+  ansible.builtin.systemd_service:
+    name: missinglink
+    enabled: yes
+# - name: setup appsettings.json for missinglink
+
+# - name: clone down awardit
+#   git:
+#     repo: "{{ awardit_repo_url }}"
+#     dest: "{{ awardit_dest_path}}"
+#     clone: yes
+#     update: yes
+
+- name: reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
