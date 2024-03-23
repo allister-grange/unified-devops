@@ -30,17 +30,25 @@ source "digitalocean" "unbuntu_main_vm" {
 build {
   sources = ["source.digitalocean.unbuntu_main_vm"]
 
+  // removes `debconf: unable to initialize frontend: Dialog` error
+  provisioner "shell" {
+    inline = [
+      "echo set debconf to Noninteractive", 
+      "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections" ]
+  }
+
   provisioner "shell" {
     inline = [
       "cloud-init status --wait",
-      "sudo apt update",
-      "sudo apt install software-properties-common -y",
-      "sudo add-apt-repository --yes --update ppa:ansible/ansible",
+      "sudo apt update -o DPkg::Lock::Timeout=-1 -y",
+      "sudo add-apt-repository -y --update ppa:ansible/ansible",
       "sudo apt install ansible -y"
     ]
   }
 
   provisioner "ansible" {
     playbook_file = "../ansible/bootstrap.yml"
+    user = "root"
+    use_proxy = false
   }
 }

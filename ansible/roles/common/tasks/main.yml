@@ -23,5 +23,4 @@
       - curl
       - jq
       - tmux
-    dpkg_options: "force-confdef,force-confold,Lock::Timeout=-1"
     state: present

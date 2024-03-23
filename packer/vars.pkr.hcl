@@ -7,7 +7,7 @@ variable "digitalocean_api_key" {
 variable "droplet_name" {
   description = "Name of droplet"
   type        = string
-  default     = "packer-vm-boooyah"
+  default     = "packer-vm"
 }
 
 variable "image" {
