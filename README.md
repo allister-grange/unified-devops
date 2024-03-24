@@ -26,9 +26,17 @@ Can I get this down with containerization and free tiers?
 
 ## next steps
 
+- move from Vercel to Cloudflare pages for startertab
+  - [ ] get a baseline of speed for comparison
+  - [ ] build out a non-prod env using terraform in Cloudflare pages
+  - [ ] swap out prod
+  - [ ] [Cloudflare link](https://developers.cloudflare.com/pages/framework-guides/nextjs/deploy-a-nextjs-site/)
+  - [ ] [Terraform link](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/pages_project)
+
 - use ansible to set up my ubuntu image with the following
   - [ ] firewall rules (hbfw and nbfw)
   - [ ] nginx
+  - [ ] redis
   - [ ] systemd for missinglink & awardit
   - [ ] cron job to call the missinglink backend
   - [ ] postgres setup
@@ -36,3 +44,5 @@ Can I get this down with containerization and free tiers?
    - [ ] nodejs and .net installs
   - [ ] configuring the swap (common)
   - [ ] s3 bucket backups for the databases
+
+- [ ] set up terraform + inspec with packer to speed up development of ansible scripts
