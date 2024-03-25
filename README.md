@@ -34,11 +34,13 @@ Can I get this down with containerization and free tiers?
   - [ ] [Terraform link](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/pages_project)
 
 - use ansible to set up my ubuntu image with the following
-  - [ ] firewall rules
-    - [ ] hbfw
+  - [X] firewall rules
+    - [X] hbfw (ssh and https, nothing else)
+  - [X] nginx
   - [ ] certificates (letsencrypt)
-  - [ ] nodejs and .net installs
-  - [ ] nginx
+    - [ ] https://rolflekang.com/using-certbot-with-ansible......
+    - [ ] https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+  - [X] nodejs and .net installs
   - [X] redis
   - [X] configuring the swap (common)
   - [X] systemd for missinglink & awardit
@@ -48,7 +50,11 @@ Can I get this down with containerization and free tiers?
     - [ ] install the db
     - [ ] accounts
     - [ ] databases (comes from s3, have a command line or variable to disable this so that it doesn't use too much bandwidth)
+- [ ] how do I do DNS to set this up as a non-prod? 
 
 - use terraform for the following
   - [ ] standing up the image
   - [ ] nbfw create a new rule and attach it (like MissingLink-Firewall)
+
+- long term todos/clean ups
+  - [ ] nginx configs should be split into 3 services

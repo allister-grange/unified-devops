@@ -1,17 +1,19 @@
-- name: Setup system with user and nginx
-  hosts: all
-  become: yes
-  tasks:
-    - name: Install nginx with specific dpkg options
-      ansible.builtin.apt:
-        name: nginx
-        state: present
-        update_cache: yes
-        dpkg_options: "force-confdef,force-confold,Lock::Timeout=-1"
-        force_apt_get: yes
+- name: install nginx with specific dpkg options
+  ansible.builtin.apt:
+    name: nginx
+    state: present
 
-    - name: Ensure nginx is enabled and will start on boot
-      ansible.builtin.systemd:
-        name: nginx
-        enabled: yes
-        state: started
+- name: ensure nginx is enabled and will start on boot
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: yes
+    state: started
+
+# deploy my configuration file for nginx, todo this won't work because it's missing certificates
+- name: copy over my nginx.conf file
+  ansible.builtin.template:
+    src: nginx.conf.h2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "0644"

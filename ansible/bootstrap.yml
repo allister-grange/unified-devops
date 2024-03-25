@@ -1,18 +1,23 @@
-- name: setup the system's base, a user for deploying and common tools
+- name: set up the system's base, a user for deploying and common tools
   hosts: all
   remote_user: root
-
   roles:
     - common
+
+- name: install and configure nginx
+  hosts: all
+  remote_user: root
+  roles:
+    - nginx
+
+- name: deploy postgres, redis and configure the databases
+  hosts: all
+  remote_user: root
+  roles:
+    - db
 
 - name: configure and deploy the webservers and application code
   hosts: all
   remote_user: root
   roles:
     - web
-# - name: deploy postgres and configure the databases
-#   hosts: dbservers
-#   remote_user: root
-
-#   roles:
-#     - db
