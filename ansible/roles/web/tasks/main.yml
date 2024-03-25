@@ -131,11 +131,21 @@
     group: root
     mode: "0644"
 
+- name: copy over missinglink shell script for creating statistics
+  ansible.builtin.template:
+    src: missinglink-updates.sh
+    dest: /home/deployer/missinglink-updates.sh
+    owner: deployer
+    group: deployer
+    mode: "0777"
+
+- name: setup cron job for calling missinglink backend
+  ansible.builtin.cron:
+    name: "call missinglink updates api endpoint"
+    minute: "0,15,30,45"
+    job: "sh /home/deployer/missinglink-updates.sh"
+    user: "deployer"
+
 - name: reload systemd
   ansible.builtin.systemd_service:
     daemon_reload: true
-### TODO CURL TESTS ###
-
-# curl localhost:3001/posts?page=1 -> what does this look like with an empty DB??
-
-# curl localhost:5001/api/v1/metlink/services (I think cors is blocking the request...)

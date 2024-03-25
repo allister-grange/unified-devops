@@ -1,0 +1,16 @@
+### REDDIS ###
+- name: Install Redis
+  ansible.builtin.command: apt-get install -y redis-server
+
+- name: Ensure Redis is running and enabled
+  ansible.builtin.service:
+    name: redis-server
+    state: started
+    enabled: yes
+### POSTGRES ###
+
+# install postgres
+
+# set up account
+
+# pull down db from s3 and import it? I think this option should come from the command line

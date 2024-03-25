@@ -34,15 +34,21 @@ Can I get this down with containerization and free tiers?
   - [ ] [Terraform link](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/pages_project)
 
 - use ansible to set up my ubuntu image with the following
-  - [ ] firewall rules (hbfw and nbfw)
-  - [ ] nginx
-  - [ ] redis
-  - [ ] systemd for missinglink & awardit
-  - [ ] cron job to call the missinglink backend
-  - [ ] postgres setup
+  - [ ] firewall rules
+    - [ ] hbfw
   - [ ] certificates (letsencrypt)
-   - [ ] nodejs and .net installs
-  - [ ] configuring the swap (common)
-  - [ ] s3 bucket backups for the databases
+  - [ ] nodejs and .net installs
+  - [ ] nginx
+  - [X] redis
+  - [X] configuring the swap (common)
+  - [X] systemd for missinglink & awardit
+  - [X] cron job to call the missinglink backend
+  - [ ] s3 bucket backups for the databases (something I need to get going on the extant VM)
+  - [ ] postgres setup
+    - [ ] install the db
+    - [ ] accounts
+    - [ ] databases (comes from s3, have a command line or variable to disable this so that it doesn't use too much bandwidth)
 
-- [ ] set up terraform + inspec with packer to speed up development of ansible scripts
+- use terraform for the following
+  - [ ] standing up the image
+  - [ ] nbfw create a new rule and attach it (like MissingLink-Firewall)
