@@ -53,7 +53,8 @@ Can I get this down with containerization and free tiers?
 - [ ] how do I do DNS to set this up as a non-prod? 
 
 - use terraform for the following
-  - [ ] standing up the image
+  - [X] standing up the image
+  - [ ] get the IP showing after creation 
   - [ ] nbfw create a new rule and attach it (like MissingLink-Firewall)
 
 - long term todos/clean ups
