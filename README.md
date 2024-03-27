@@ -37,15 +37,17 @@ Can I get this down with containerization and free tiers?
   - [X] firewall rules
     - [X] hbfw (ssh and https, nothing else)
   - [X] nginx
-  - [ ] certificates (letsencrypt)
-    - [ ] https://rolflekang.com/using-certbot-with-ansible......
-    - [ ] https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
   - [X] nodejs and .net installs
   - [X] redis
   - [X] configuring the swap (common)
   - [X] systemd for missinglink & awardit
   - [X] cron job to call the missinglink backend
   - [ ] s3 bucket backups for the databases (something I need to get going on the extant VM)
+    - [ ] procure an s3 api key
+    - [ ] use terraform to build an s3 bucket
+    - [ ] get a script working that takes a postgres backup to a directory
+    - [ ] use a cron job to push that up to s3
+    - [ ] include those scripts (to pull down once), and then to push up in the future in ansibleow to 
   - [ ] postgres setup
     - [ ] install the db
     - [ ] accounts
@@ -54,8 +56,17 @@ Can I get this down with containerization and free tiers?
 
 - use terraform for the following
   - [X] standing up the image
-  - [ ] get the IP showing after creation 
-  - [ ] nbfw create a new rule and attach it (like MissingLink-Firewall)
+  - [X] get the IP showing after creation 
+  - [X] nbfw create a new rule and attach it
+  - [ ] test the ssh to the host with those locked down ips
+  - [ ] edit aws route53 to point the non-prod dns entry to the host's IP using provisioners
+    - [ ] gonna need an amazon API key...
+  - [X] certificates (letsencrypt)
+    - [ ] generate letsencrypt certs (sudo certbot --nginx)
+
 
 - long term todos/clean ups
   - [ ] nginx configs should be split into 3 services
+
+
+In its current state, I would need to manually point the Route 53 dns records to the new host, and then run `sudo certbot --nginx`, then it should be good to go. I can automate this using provisioners on the Terraform side of things. I should set up the databases before this. 
