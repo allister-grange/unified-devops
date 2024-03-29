@@ -24,6 +24,7 @@
       - git
       - jq
       - tmux
+      - awscli
     state: present
 
 ### FIREWALL RULES ###

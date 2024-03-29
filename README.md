@@ -26,6 +26,10 @@ Can I get this down with containerization and free tiers?
 
 ## next steps
 
+- next action
+  - [ ] pull down the latest db backup on the new server and restore the databases
+  - [ ] push the db backup script onto the new server and set up the cron job
+
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
   - [ ] build out a non-prod env using terraform in Cloudflare pages
@@ -43,14 +47,16 @@ Can I get this down with containerization and free tiers?
   - [X] systemd for missinglink & awardit
   - [X] cron job to call the missinglink backend
   - [ ] s3 bucket backups for the databases (something I need to get going on the extant VM)
-    - [ ] procure an s3 api key
-    - [ ] use terraform to build an s3 bucket
+    - [X] procure an s3 api key
+    - [X] use terraform to build an s3 bucket
     - [ ] get a script working that takes a postgres backup to a directory
-    - [ ] use a cron job to push that up to s3
-    - [ ] include those scripts (to pull down once), and then to push up in the future in ansibleow to 
+      - [X] need to create a new disk volume, running out of space (20gb) (needs 5gb then more for backing up...)
+    - [ ] use a cron job to back up and push up the backup to s3 daily
+    - [ ] include those scripts (to pull down once), and then to push up in the future 
   - [ ] postgres setup
     - [ ] install the db
     - [ ] accounts
+    - [ ] edit the PostgreSQL pg_hba.conf file so that it allows logins from localhost so I can take backups [answer](https://chat.openai.com/c/b51fb1c3-42ad-4ec0-ae07-6b261d9d01e3)
     - [ ] databases (comes from s3, have a command line or variable to disable this so that it doesn't use too much bandwidth)
 - [ ] how do I do DNS to set this up as a non-prod? 
 
