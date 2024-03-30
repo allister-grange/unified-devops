@@ -14,3 +14,26 @@
 # set up account
 
 # pull down db from s3 and import it? I think this option should come from the command line
+# - name: get list of objects in S3 bucket, I want to find the most recent db backup
+#   shell: aws s3 ls s3://unified-devops-db-backups/ --recursive --human-readable --summarize --query 'reverse(sort_by(Contents, &LastModified))[0].Key' --output text
+#   register: latest_file
+
+# - name: download most recent backup
+#   shell: aws s3 cp s3://unified-devops-db-backups/{{ latest_file.stdout }} /mnt/
+
+# give root login permissions to the db
+
+- name: copy over the backup script
+  ansible.builtin.template:
+    src: backup_db.sh.h2
+    dest: /home/deployer/backup_db.sh
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: set up the cronjob to run the backup once every 6 hours
+  ansible.builtin.cron:
+    name: "backing up dbs every 6 hours"
+    hour: "*/6"
+    job: "sh /home/deployer/backup_db.sh"
+    user: "root"

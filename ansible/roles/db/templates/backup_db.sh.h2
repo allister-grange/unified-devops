@@ -1,5 +1,5 @@
 #!/bin/bash
-timestamp=$(date +%Y%m%d%H%)
+timestamp=$(date +%Y%m%d%H)
 BACKUP_DIR="/mnt/volume_missinglink_db"
 BACKUP_FILE="$BACKUP_DIR/db_backup_$timestamp.sql"
 

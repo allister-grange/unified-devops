@@ -33,8 +33,8 @@ build {
   // removes `debconf: unable to initialize frontend: Dialog` error
   provisioner "shell" {
     inline = [
-      "echo set debconf to Noninteractive", 
-      "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections" ]
+      "echo set debconf to Noninteractive",
+    "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections"]
   }
 
   provisioner "shell" {
@@ -48,8 +48,11 @@ build {
 
   provisioner "ansible" {
     playbook_file = "../ansible/bootstrap.yml"
-    user = "root"
-    use_proxy = false
+    user          = "root"
+    use_proxy     = false
+    extra_arguments = [
+      "--vault-password-file=vaultpwfile"
+    ]
   }
 }
 
