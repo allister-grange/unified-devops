@@ -88,16 +88,31 @@ resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {
   # log into the remote host and then pull down the latest db backup
   # can't be done using remote-exec on the droplet as the volume
   # needs to be mounted first
-  provisioner "local-exec" {
-    command = <<-EOT
-      ssh -o StrictHostKeychecking=no root@${digitalocean_droplet.web.ipv4_address}
-      aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt
-      latest_file=$(cat /tmp/latest_file.txt)
-      file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )
-      echo $file_path/$latest_file
-      aws s3 cp s3://unified-devops-db-backups/$latest_file $file_path/db_backup.sql
-    EOT
+    connection {
+    type     = "ssh"
+    user     = "root"
+    host     = digitalocean_droplet.web.ipv4_address
+    private_key = file("~/.ssh/id_rsa")
   }
+
+  provisioner "remote-exec" {
+        inline = [
+          "aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt",
+          "latest_file=$(cat /tmp/latest_file.txt)",
+          "file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )",
+          "echo $file_path/$latest_file",
+          "aws s3 cp s3://unified-devops-db-backups/$latest_file mnt/$file_path/db_backup.sql"
+        ]
+  }
+
+  #  inline = <<-EOT
+  #     ssh -o StrictHostKeychecking=no root@${digitalocean_droplet.web.ipv4_address}
+  #     aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt
+  #     latest_file=$(cat /tmp/latest_file.txt)
+  #     file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )
+  #     echo $file_path/$latest_file
+  #     aws s3 cp s3://unified-devops-db-backups/$latest_file $file_path/db_backup.sql
+  #   EOT
 }
 
 resource "aws_s3_bucket" "s3_bucket_db_backups" {
