@@ -76,7 +76,7 @@ resource "digitalocean_firewall" "web" {
 
 resource "digitalocean_volume" "missinglink_db_volume" {
   region                  = "syd1"
-  name                    = "volume-missinglink-db-non-prod"
+  name                    = "missinglink-data"
   initial_filesystem_type = "ext4"
   size                    = 6
 }
@@ -84,6 +84,20 @@ resource "digitalocean_volume" "missinglink_db_volume" {
 resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {
   droplet_id = digitalocean_droplet.web.id
   volume_id  = digitalocean_volume.missinglink_db_volume.id
+
+  # log into the remote host and then pull down the latest db backup
+  # can't be done using remote-exec on the droplet as the volume
+  # needs to be mounted first
+  provisioner "local-exec" {
+    command = <<-EOT
+      ssh -o StrictHostKeychecking=no root@${digitalocean_droplet.web.ipv4_address}
+      aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt
+      latest_file=$(cat /tmp/latest_file.txt)
+      file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )
+      echo $file_path/$latest_file
+      aws s3 cp s3://unified-devops-db-backups/$latest_file $file_path/db_backup.sql
+    EOT
+  }
 }
 
 resource "aws_s3_bucket" "s3_bucket_db_backups" {
@@ -127,7 +141,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "aws_s3_bucket_lifecycle_db_bac
     id     = "delete_old_backups"
     status = "Enabled"
     expiration {
-      days = 7
+      days = 3
     }
   }
 }

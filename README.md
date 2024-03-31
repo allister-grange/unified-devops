@@ -27,8 +27,10 @@ Can I get this down with containerization and free tiers?
 ## next steps
 
 - next action
-  - [ ] certificates yaml task not being run
   - [ ] I want to restore the database from the latest push into s3, HOWEVER I can only do this after terraform mounts the new drive, this means that I will have to run it after the terraform in a provisions
+    - [ ] Restore the db from backup
+
+  - [ ] Next build I need to see if certbot is installed, and if there's a db backup on the vm /mnt/ directory
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
@@ -76,6 +78,7 @@ Can I get this down with containerization and free tiers?
   - [ ] go through and tidy up all hardcoded paths
   - [ ] split out the common set up into 3 files
   - [ ] can I merge group_vars and the vars folders?
+  - [ ] I need to know if the database backups into s3 fail
 
 
 In its current state, I would need to manually point the Route 53 dns records to the new host, and then run `sudo certbot --nginx`, then it should be good to go. I can automate this using provisioners on the Terraform side of things. I should set up the databases before this. 

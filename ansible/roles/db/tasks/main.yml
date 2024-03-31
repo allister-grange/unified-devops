@@ -1,25 +1,22 @@
 ### REDDIS ###
-- name: Install Redis
+- name: install Redis
   ansible.builtin.command: apt-get install -y redis-server
 
-- name: Ensure Redis is running and enabled
+- name: ensure Redis is running and enabled
   ansible.builtin.service:
     name: redis-server
     state: started
     enabled: yes
+
 ### POSTGRES ###
+- name: install postgres
+  ansible.builtin.command: apt-get install -y postgres
 
-# install postgres
-
-# set up account
-
-# pull down db from s3 and import it? I think this option should come from the command line
-# - name: get list of objects in S3 bucket, I want to find the most recent db backup
-#   shell: aws s3 ls s3://unified-devops-db-backups/ --recursive --human-readable --summarize --query 'reverse(sort_by(Contents, &LastModified))[0].Key' --output text
-#   register: latest_file
-
-# - name: download most recent backup
-#   shell: aws s3 cp s3://unified-devops-db-backups/{{ latest_file.stdout }} /mnt/
+- name: ensure postgres is running and enabled
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: yes
 
 # give root login permissions to the db
 

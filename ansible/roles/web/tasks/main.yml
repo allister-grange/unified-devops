@@ -149,3 +149,13 @@
 - name: reload systemd
   ansible.builtin.systemd_service:
     daemon_reload: true
+
+### CERTIFICATES ###
+
+- name: install certbot using snapd
+  ansible.builtin.shell:
+    cmd: sudo snap install --classic certbot
+
+- name: prepare certbot command
+  ansible.builtin.shell:
+    cmd: sudo ln -s /snap/bin/certbot /usr/bin/certbot
