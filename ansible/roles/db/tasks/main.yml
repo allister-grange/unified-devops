@@ -21,8 +21,8 @@
 - name: give root login permissions to the db
   ansible.builtin.shell:
     cmd: |
-      cp /etc/postgresql/12/main/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf.backup &&
-      sed -i "s/local   all             postgres                                peer/local   all             postgres                                trust/" /etc/postgresql/12/main/pg_hba.conf
+      cp /etc/postgresql/14/main/pg_hba.conf /etc/postgresql/14/main/pg_hba.conf.backup &&
+      sed -i "s/local   all             postgres                                peer/local   all             postgres                                trust/" /etc/postgresql/14/main/pg_hba.conf
 
 - name: restart postgres to lock in permission changes
   ansible.builtin.service:

@@ -13,7 +13,7 @@ variable "droplet_name" {
 variable "image" {
   description = "The desired image for VM"
   type        = string
-  default     = "ubuntu-20-04-x64"
+  default     = "ubuntu-22-04-x64"
 }
 
 variable "region" {
