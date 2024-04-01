@@ -4,7 +4,7 @@ BACKUP_DIR="/mnt/volume_missinglink_db"
 BACKUP_FILE="$BACKUP_DIR/db_backup_$timestamp.sql"
 
 # Perform database backup
-pg_dumpall -U grangeal > "$BACKUP_FILE"
+pg_dumpall -c -U grangeal -f "$BACKUP_FILE"
 
 # Sync backup to S3
 aws s3 sync "$BACKUP_DIR" "s3://unified-devops-db-backups/" 

@@ -10,7 +10,7 @@
 
 ### POSTGRES ###
 - name: install postgres
-  ansible.builtin.command: apt-get install -y postgres
+  ansible.builtin.command: apt-get install -y postgresql-14
 
 - name: ensure postgres is running and enabled
   ansible.builtin.service:
@@ -18,7 +18,16 @@
     state: started
     enabled: yes
 
-# give root login permissions to the db
+- name: give root login permissions to the db
+  ansible.builtin.shell:
+    cmd: |
+      cp /etc/postgresql/12/main/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf.backup &&
+      sed -i "s/local   all             postgres                                peer/local   all             postgres                                trust/" /etc/postgresql/12/main/pg_hba.conf
+
+- name: restart postgres to lock in permission changes
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
 
 - name: copy over the backup script
   ansible.builtin.template:
