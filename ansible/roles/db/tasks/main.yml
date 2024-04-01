@@ -22,6 +22,7 @@
   ansible.builtin.shell:
     cmd: |
       cp /etc/postgresql/14/main/pg_hba.conf /etc/postgresql/14/main/pg_hba.conf.backup &&
+      sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" /etc/postgresql/14/main/pg_hba.conf
       sed -i "s/local   all             postgres                                peer/local   all             postgres                                trust/" /etc/postgresql/14/main/pg_hba.conf
 
 - name: restart postgres to lock in permission changes

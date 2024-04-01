@@ -85,24 +85,25 @@ resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {
   droplet_id = digitalocean_droplet.web.id
   volume_id  = digitalocean_volume.missinglink_db_volume.id
 
-    connection {
-    type     = "ssh"
-    user     = "root"
-    host     = digitalocean_droplet.web.ipv4_address
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.web.ipv4_address
     private_key = file("~/.ssh/id_rsa")
   }
 
   # log into the remote host and then pull down the latest db backup
-  # then restore from that db
+  # then restore all dbs and remove the backup
   provisioner "remote-exec" {
-        inline = [
-          "aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt",
-          "latest_file=$(cat /tmp/latest_file.txt)",
-          "file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )",
-          "echo $file_path/$latest_file",
-          "aws s3 cp s3://unified-devops-db-backups/$latest_file /mnt/$file_path/db_backup.sql"
-          # "psql -f /mnt/$file_path/db_backup.sql postgres"
-        ]
+    inline = [
+      "aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt",
+      "latest_file=$(cat /tmp/latest_file.txt)",
+      "file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )",
+      "echo $file_path/$latest_file",
+      "aws s3 cp s3://unified-devops-db-backups/$latest_file /mnt/$file_path/db_backup.sql",
+      "psql -f /mnt/$file_path/db_backup.sql -U postgres",
+      "rm /mnt/$file_path/db_backup.sql"
+    ]
   }
 }
 
