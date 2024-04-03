@@ -27,13 +27,8 @@ Can I get this down with containerization and free tiers?
 ## next steps
 
 - next action
-  - [ ] Restore the db from backup
-     - [ ] build with terraform and test
-    - [ ] create db shitlink, umami, awardit, then import them all [link](https://dba.stackexchange.com/questions/75033/how-to-restore-everything-including-postgres-role-from-pg-dumpall-backup)
-
-  - [ ] once built
-    - [ ] check certbot
-    - [ ] check db is populated (including the grangeal account?)
+  - [ ] spin up and test if I can query the api
+  - [ ] test to see if h2 is used on the api 
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
@@ -51,38 +46,42 @@ Can I get this down with containerization and free tiers?
   - [X] configuring the swap (common)
   - [X] systemd for missinglink & awardit
   - [X] cron job to call the missinglink backend
-  - [ ] s3 bucket backups for the databases (something I need to get going on the extant VM)
+  - [X] s3 bucket backups for the databases (something I need to get going on the extant VM)
     - [X] procure an s3 api key
     - [X] use terraform to build an s3 bucket
-    - [ ] get a script working that takes a postgres backup to a directory
+    - [X] get a script working that takes a postgres backup to a directory
       - [X] need to create a new disk volume, running out of space (20gb) (needs 5gb then more for backing up...)
-    - [ ] use a cron job to back up and push up the backup to s3 daily
-    - [ ] include those scripts (to pull down once), and then to push up in the future 
-  - [ ] postgres setup
-    - [ ] install the db
-    - [ ] accounts
-    - [ ] edit the PostgreSQL pg_hba.conf file so that it allows logins from localhost so I can take backups [answer](https://chat.openai.com/c/b51fb1c3-42ad-4ec0-ae07-6b261d9d01e3)
-    - [ ] databases (comes from s3, have a command line or variable to disable this so that it doesn't use too much bandwidth)
+    - [X] use a cron job to back up and push up the backup to s3 daily
+    - [X] include those scripts (to pull down once), and then to push up in the future 
+  - [X] postgres setup
+    - [X] install the db
+    - [X] accounts
+    - [X] edit the PostgreSQL pg_hba.conf file so that it allows logins from localhost so I can take backups [answer](https://chat.openai.com/c/b51fb1c3-42ad-4ec0-ae07-6b261d9d01e3)
+    - [X] databases (comes from s3, have a command line or variable to disable this so that it doesn't use too much bandwidth)
 - [ ] how do I do DNS to set this up as a non-prod? 
 
 - use terraform for the following
   - [X] standing up the image
   - [X] get the IP showing after creation 
   - [X] nbfw create a new rule and attach it
-  - [ ] test the ssh to the host with those locked down ips
   - [ ] edit aws route53 to point the non-prod dns entry to the host's IP using provisioners
-    - [ ] gonna need an amazon API key...
   - [X] certificates (letsencrypt)
     - [ ] generate letsencrypt certs (sudo certbot --nginx)
+  - [X] set up nginx for non-prod
+  - [X] set up dns records for non-prod using route 53
+  - [ ] set up certificates
+  - [ ] test the sites
+    - [ ] how do I manage the non-prods in Vercel, I need to get my backend urls from env variables
 
 
 - long term todos/clean ups
+  - [ ] build a diagram to show what these scripts are doing, or just a list
   - [ ] nginx configs should be split into 3 services
   - [ ] go through and tidy up all hardcoded paths
-  - [ ] split out the common set up into 3 files
+  - [ ] split out the common set up ansible file into 3 files
   - [ ] can I merge group_vars and the vars folders?
-  - [ ] I need to know if the database backups into s3 fail
-  - [ ] only push up the DB backups if it's PROD
-
-
-In its current state, I would need to manually point the Route 53 dns records to the new host, and then run `sudo certbot --nginx`, then it should be good to go. I can automate this using provisioners on the Terraform side of things. I should set up the databases before this. 
+  - [ ] I need to know if the database backups into s3 fail somehow, scripts?
+  - [ ] verify the login methods for postgres (anki)
+  - [ ] separate out prod/non-prod builds
+    - [ ] only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
+    - [ ] domain names

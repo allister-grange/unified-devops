@@ -152,3 +152,44 @@ resource "aws_s3_bucket_lifecycle_configuration" "aws_s3_bucket_lifecycle_db_bac
     }
   }
 }
+
+# MissingLink backend zone
+resource "aws_route53_zone" "missinglink_zone" {
+  name = "missinglink.link"
+}
+
+resource "aws_route53_record" "missinglink_backend_record" {
+  zone_id = aws_route53_zone.missinglink_zone.zone_id
+  name    = "qa.backend.missinglink.link"
+  type    = "A"
+  ttl     = "300"
+  records = ["${digitalocean_droplet.web.ipv4_address}"]
+}
+
+# AwardIt backend zone
+resource "aws_route53_zone" "awardit_zone" {
+  name = "awardit.info"
+}
+
+resource "aws_route53_record" "awardit_backend_record" {
+  zone_id = aws_route53_zone.awardit_zone.zone_id
+  name    = "qa.backend.awardit.info"
+  type    = "A"
+  ttl     = "300"
+  records = ["${digitalocean_droplet.web.ipv4_address}"]
+  
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.web.ipv4_address
+    private_key = file("~/.ssh/id_rsa")
+  }
+
+  # install certificates on the host now that the aws routes are built
+  provisioner "remote-exec" {
+    inline = [
+      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains qa.backend.missinglink.link,qa.backend.awardit.infosudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains qa.backend.missinglink.link,qa.backend.awardit.info"
+    ]
+  }
+
+}

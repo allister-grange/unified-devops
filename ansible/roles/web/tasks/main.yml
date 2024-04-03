@@ -6,6 +6,12 @@
       - dotnet-sdk-6.0
     state: present
 
+- name: setup dotnet cert for localhost 443, don't worry, the system is fronted by nginx
+  ansible.builtin.shell:
+    cmd: |
+      dotnet dev-certs https --clean &&
+      dotnet dev-certs https --trust
+
 ### MISSINGLINK ###
 
 - name: clone down missinglink
@@ -20,12 +26,6 @@
     cmd: |
       cd /home/deployer/missinglink/backend/MissingLink.Api/ &&
       dotnet publish -c "Release"
-
-- name: setup dotnet cert for localhost 443, don't worry, the system is fronted by nginx
-  ansible.builtin.shell:
-    cmd: |
-      dotnet dev-certs https --clean &&
-      dotnet dev-certs https --trust
 
 - name: setup appsettings.json for missinglink
   ansible.builtin.shell:
@@ -136,7 +136,7 @@
     name: "call missinglink updates api endpoint"
     minute: "0,15,30,45"
     job: "sh /home/deployer/missinglink-updates.sh"
-    user: "deployer"
+    user: "root"
 
 - name: reload systemd
   ansible.builtin.systemd_service:
