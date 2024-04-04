@@ -178,7 +178,15 @@ resource "aws_route53_record" "awardit_backend_record" {
   type    = "A"
   ttl     = "300"
   records = ["${digitalocean_droplet.web.ipv4_address}"]
-  
+  depends_on = [ digitalocean_droplet.web ]
+}
+
+# I only want to trigger this whenever the digital ocean droplet is re-built
+resource "null_resource" "install certs" {
+  triggers = {
+    key = "${ digitalocean_droplet.web.id }"
+  }
+
   connection {
     type        = "ssh"
     user        = "root"
@@ -186,23 +194,10 @@ resource "aws_route53_record" "awardit_backend_record" {
     private_key = file("~/.ssh/id_rsa")
   }
 
-  # install certificates on the host now that the aws routes are built
   provisioner "remote-exec" {
     inline = [
-      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains qa.backend.missinglink.link,qa.backend.awardit.info > /home/deployer/certbot.log"
+      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains qa.backend.missinglink.link,qa.backend.awardit.info"
     ]
   }
-
-  depends_on = [ digitalocean_droplet.web ]
 }
-
-# resource "null_resource" "ansible" {
-#   triggers = {
-#     key = "${uuid()}"
-#   }
-
-#   provisioner "local-exec" {
-#     command = "ansible-playbook -i /usr/local/bin/terraform-inventory -u ubuntu playbook.yml --private-key=/home/user/.ssh/aws_user.pem -u ubuntu"
-#   }
-# }
 
