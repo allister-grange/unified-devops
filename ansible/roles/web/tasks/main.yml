@@ -6,11 +6,10 @@
       - dotnet-sdk-6.0
     state: present
 
-- name: setup dotnet cert for localhost 443, don't worry, the system is fronted by nginx
-  ansible.builtin.shell:
-    cmd: |
-      dotnet dev-certs https --clean &&
-      dotnet dev-certs https --trust
+- name: setup dotnet cert for localhost
+  ansible.builtin.command: dotnet dev-certs https --trust
+  become: true
+  become_user: deployer
 
 ### MISSINGLINK ###
 

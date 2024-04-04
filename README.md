@@ -27,7 +27,8 @@ Can I get this down with containerization and free tiers?
 ## next steps
 
 - next action
-  - [ ] spin up and test if I can query the api
+  - [ ] test the missinglink service, if it fails it's about trusting the dev certs
+  - [ ] actually call the script to build the database values for services once it's built
   - [ ] test to see if h2 is used on the api 
 
 - move from Vercel to Cloudflare pages for startertab
