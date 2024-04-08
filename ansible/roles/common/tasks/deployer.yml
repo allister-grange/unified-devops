@@ -1,0 +1,12 @@
+- name: create the deployer group
+  ansible.builtin.group:
+    name: deployer
+    gid: 1001
+    state: present
+
+- name: create the deployer user and add it to the deployer group
+  ansible.builtin.user:
+    name: deployer
+    uid: 1001
+    group: 1001
+    createhome: yes

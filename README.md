@@ -27,9 +27,11 @@ Can I get this down with containerization and free tiers?
 ## next steps
 
 - next action
-  - [ ] test the missinglink service, if it fails it's about trusting the dev certs
-  - [ ] actually call the script to build the database values for services once it's built
   - [ ] test to see if h2 is used on the api 
+  - [ ] split out the common set up ansible file into 3 files
+
+
+
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
@@ -67,19 +69,18 @@ Can I get this down with containerization and free tiers?
   - [X] nbfw create a new rule and attach it
   - [ ] edit aws route53 to point the non-prod dns entry to the host's IP using provisioners
   - [X] certificates (letsencrypt)
-    - [ ] generate letsencrypt certs (sudo certbot --nginx)
+    - [X] generate letsencrypt certs (sudo certbot --nginx)
   - [X] set up nginx for non-prod
   - [X] set up dns records for non-prod using route 53
-  - [ ] set up certificates
-  - [ ] test the sites
-    - [ ] how do I manage the non-prods in Vercel, I need to get my backend urls from env variables
+  - [X] set up certificates
+  - [X] test the sites
+    - [ ] how do I manage the non-prods envs linking in with Vercel, I need to get my backend urls from env variables
 
 
 - long term todos/clean ups
   - [ ] build a diagram to show what these scripts are doing, or just a list
-  - [ ] nginx configs should be split into 3 services
   - [ ] go through and tidy up all hardcoded paths
-  - [ ] split out the common set up ansible file into 3 files
+  - [ ] nginx configs should be split into 3 services
   - [ ] can I merge group_vars and the vars folders?
   - [ ] I need to know if the database backups into s3 fail somehow, scripts?
   - [ ] verify the login methods for postgres (anki)

@@ -37,10 +37,10 @@
     owner: root
     group: root
     mode: "0700"
-
-- name: set up the cronjob to run the backup once every 6 hours
-  ansible.builtin.cron:
-    name: "backing up dbs every 6 hours"
-    hour: "*/6"
-    job: "sh /home/deployer/backup_db.sh"
-    user: "root"
+# TODO only push up backups if this is prod
+# - name: set up the cronjob to run the backup once every 6 hours
+#   ansible.builtin.cron:
+#     name: "backing up dbs every 6 hours"
+#     hour: "*/6"
+#     job: "sh /home/deployer/backup_db.sh"
+#     user: "root"

@@ -1,0 +1,15 @@
+- name: Include AWS Secrets
+  ansible.builtin.include_vars:
+    file: aws_secrets.yml
+
+- name: Set AWS Access Key ID
+  ansible.builtin.command:
+    cmd: "aws configure set aws_access_key_id {{ aws_access_key_id }}"
+
+- name: Set AWS Secret Access Key
+  ansible.builtin.command:
+    cmd: "aws configure set aws_secret_access_key {{ aws_secret_access_key }}"
+
+- name: Set AWS Default Region
+  ansible.builtin.command:
+    cmd: "aws configure set region {{ aws_default_region }}"

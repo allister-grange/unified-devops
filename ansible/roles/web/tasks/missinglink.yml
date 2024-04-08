@@ -1,0 +1,90 @@
+- name: setup dotnet cert for localhost
+  ansible.builtin.command: dotnet dev-certs https --trust
+  become: true
+  become_user: deployer
+
+- name: clone down missinglink
+  ansible.builtin.git:
+    repo: "{{ missinglink_repo_url }}"
+    dest: "{{ missinglink_dest_path }}"
+    clone: yes
+    update: yes
+
+- name: build missinglink
+  ansible.builtin.shell:
+    cmd: |
+      cd /home/deployer/missinglink/backend/MissingLink.Api/ &&
+      dotnet publish -c "Release"
+
+- name: setup appsettings.json for missinglink
+  ansible.builtin.shell:
+    cmd: |
+      cd /home/deployer/missinglink/backend/MissingLink.Api/ &&
+      sed -i "s/Host=localhost;Database=<YOUR-DB-NAME-HERE>;Username=<YOUR-DB-USERNAME-HERE>;Password=<YOUR-DB-PASS-HERE>/{{ lookup('env', 'POSTGRES_CONNECTION_STRING') }}/g" ./appsettings.json &&
+      sed -i "s/<METLINK-API-KEY>/{{ lookup('env', 'METLINK_API_KEY') }}/g" ./appsettings.json &&
+      sed -i "s/<AT-API-KEY-1>/{{ lookup('env', 'ATAPIKEY1') }}/g" ./appsettings.json &&
+      sed -i "s/<AT-API-KEY-2>/{{ lookup('env', 'ATAPIKEY2') }}/g" ./appsettings.json &&
+      sed -i "s/<YOUR-REDIS-DB-HERE>/{{ lookup('env', 'REDIS_HOST') }}/g" ./appsettings.json
+
+- name: Check the POSTGRES_CONNECTION_STRING value in appsettings.json
+  ansible.builtin.command: jq -r '.ConnectionStrings.Postgres' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  register: postgres_conn_str
+
+- name: Assert POSTGRES_CONNECTION_STRING is not empty or default
+  ansible.builtin.assert:
+    that:
+      - postgres_conn_str.stdout != ""
+      - postgres_conn_str.stdout != "Host=localhost;Database=<YOUR-DB-NAME-HERE>;Username=<YOUR-DB-USERNAME-HERE>;Password=<YOUR-DB-PASS-HERE>"
+
+- name: Check the METLINK-API-KEY value in appsettings.json
+  ansible.builtin.shell: jq -r '.MetlinkApiConfig.MetlinkApiKey' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  register: metlink_api_key
+
+- name: Assert METLINK-API-KEY is not empty or default
+  ansible.builtin.assert:
+    that:
+      - metlink_api_key.stdout != ""
+      - metlink_api_key.stdout != "<METLINK_API_KEY>"
+
+- name: Check the AT-API-KEY-1 value in appsettings.json
+  ansible.builtin.shell: jq -r '.AtApiConfig.AtApiKey1' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  register: at_api_key_1
+
+- name: Assert AT-API-KEY-1 is not empty or default
+  ansible.builtin.assert:
+    that:
+      - at_api_key_1.stdout != ""
+      - at_api_key_1.stdout != "<AT-API-KEY-1>"
+
+- name: Check the AT-API-KEY-2 value in appsettings.json
+  ansible.builtin.shell: jq -r '.AtApiConfig.AtApiKey2' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  register: at_api_key_2
+
+- name: Assert AT-API-KEY-2 is not empty or default
+  ansible.builtin.assert:
+    that:
+      - at_api_key_2.stdout != ""
+      - at_api_key_2.stdout != "<AT-API-KEY-2>"
+
+- name: Check the redis connection value in appsettings.json
+  ansible.builtin.shell: jq -r '.ConnectionStrings.Redis' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  register: at_api_key_2
+
+- name: Assert redis connection value is not empty or default
+  ansible.builtin.assert:
+    that:
+      - at_api_key_2.stdout != ""
+      - at_api_key_2.stdout != "<YOUR-REDIS-DB-HERE>"
+
+- name: setup systemd file for missinglink
+  ansible.builtin.template:
+    src: missinglink.service.j2
+    dest: /etc/systemd/system/missinglink.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: enable missinglink in systemd
+  ansible.builtin.systemd_service:
+    name: missinglink
+    enabled: yes
