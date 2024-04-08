@@ -27,8 +27,9 @@ Can I get this down with containerization and free tiers?
 ## next steps
 
 - next action
-  - [ ] test to see if h2 is used on the api 
-  - [ ] split out the common set up ansible file into 3 files
+  - [X] split out the common set up ansible file into 3 files
+    - [ ] only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
+    - [ ] only configuration files should change if it's prod/non-prod where I can
 
 
 
@@ -83,7 +84,6 @@ Can I get this down with containerization and free tiers?
   - [ ] nginx configs should be split into 3 services
   - [ ] can I merge group_vars and the vars folders?
   - [ ] I need to know if the database backups into s3 fail somehow, scripts?
-  - [ ] verify the login methods for postgres (anki)
   - [ ] separate out prod/non-prod builds
     - [ ] only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
-    - [ ] domain names
+    - [ ] domain names should be sorted by prod/non-prod

@@ -1,5 +1,14 @@
-- include_tasks: deployer.yaml
-- include_tasks: installs.yaml
-- include_tasks: firewall.yaml
-- include_tasks: swap.yaml
-- include_tasks: aws.yaml
+- name: include tasks for deployer user setup
+  import_tasks: deployer.yml
+
+- name: include tasks for installing general packages
+  import_tasks: installs.yml
+
+- name: include tasks for setting up the firewall
+  import_tasks: firewall.yml
+
+- name: include tasks for setting up the swap
+  import_tasks: swap.yml
+
+- name: include tasks for AWS cli setup
+  import_tasks: aws.yml

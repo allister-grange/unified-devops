@@ -182,7 +182,7 @@ resource "aws_route53_record" "awardit_backend_record" {
 }
 
 # I only want to trigger this whenever the digital ocean droplet is re-built
-resource "null_resource" "install certs and popualte db" {
+resource "null_resource" "install_certs_and_populate_db" {
   triggers = {
     key = "${ digitalocean_droplet.web.id }"
   }
@@ -197,8 +197,9 @@ resource "null_resource" "install certs and popualte db" {
   provisioner "remote-exec" {
     inline = [
       "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains qa.backend.missinglink.link,qa.backend.awardit.info",
-      "./home/deployer/missinglink-updates.sh"
+      "sed -i \"s/listen 443 ssl;/listen 443 ssl http2;/g\" /etc/nginx/nginx.conf",
+      "sudo service nginx restart",
+      "bash /home/deployer/missinglink-updates.sh"
     ]
   }
 }
-

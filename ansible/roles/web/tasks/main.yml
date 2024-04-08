@@ -1,3 +1,8 @@
-- include_tasks: awardit.yaml
-- include_tasks: certificates.yaml
-- include_tasks: missinglink.yaml
+- name: include tasks for setting up awardit
+  ansible.builtin.import_tasks: awardit.yml
+
+- name: include tasks for setting up missinglink
+  ansible.builtin.import_tasks: missinglink.yml
+
+- name: include setting up certificates
+  ansible.builtin.import_tasks: certificates.yml
