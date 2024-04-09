@@ -19,13 +19,28 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
+variable "missinglink_domain" {
+  description = "domain for the missinglink backend"
+  default = "qa.backend.missinglink.link"
+}
+
+variable "awardit_domain" {
+  description = "domain for the awardit backend"
+  default = "qa.backend.awardit.info"
+}
+
+variable "env" {
+  description = "env that is being run, by default it's dev"
+  default = "dev"
+}
+
 data "digitalocean_ssh_key" "ssh_key" {
   name = var.digital_ocean_ssh_key_name
 }
 
 resource "digitalocean_droplet" "web" {
   image  = var.packer_image_id
-  name   = "unified-devops-${formatdate("DD-MM-YY", timestamp())}"
+  name   = "unified-devops-${var.env}-${formatdate("DD-MM-YY", timestamp())}"
   region = "syd1"
   size   = "s-1vcpu-1gb"
   ssh_keys = [
@@ -160,11 +175,12 @@ resource "aws_route53_zone" "missinglink_zone" {
 
 resource "aws_route53_record" "missinglink_backend_record" {
   zone_id = aws_route53_zone.missinglink_zone.zone_id
-  name    = "qa.backend.missinglink.link"
+  name    = var.missinglink_domain
   type    = "A"
   ttl     = "300"
   records = ["${digitalocean_droplet.web.ipv4_address}"]
   depends_on = [ digitalocean_droplet.web ]
+
 }
 
 # AwardIt backend zone
@@ -174,7 +190,7 @@ resource "aws_route53_zone" "awardit_zone" {
 
 resource "aws_route53_record" "awardit_backend_record" {
   zone_id = aws_route53_zone.awardit_zone.zone_id
-  name    = "qa.backend.awardit.info"
+  name    = var.awardit_domain
   type    = "A"
   ttl     = "300"
   records = ["${digitalocean_droplet.web.ipv4_address}"]
@@ -196,7 +212,7 @@ resource "null_resource" "install_certs_and_populate_db" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains qa.backend.missinglink.link,qa.backend.awardit.info",
+      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains ${var.missinglink_domain},${var.awardit_domain}",
       "sed -i \"s/listen 443 ssl;/listen 443 ssl http2;/g\" /etc/nginx/nginx.conf",
       "sudo service nginx restart",
       "bash /home/deployer/missinglink-updates.sh"
