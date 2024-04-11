@@ -26,12 +26,14 @@ Can I get this down with containerization and free tiers?
 
 ## next steps
 
-- next action
-  - [X] split out the common set up ansible file into 3 files
+- next action 
+  - [ ] test the terraform after changes
+  - [ ] ansible changes
+    - [ ] go through all of ansible and determine if I don't want anything in a prod/non-prod set up
+      - [ ] set up umami for non-prod, who cares if it's another cert etc?
+        - [ ] it's linked in the code headers, so I can set it up, it will just do nothing, so who cares? if I really care, I could set it via environment variables
     - [ ] only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
-    - [ ] only configuration files should change if it's prod/non-prod where I can
-
-
+      - [ ] should I just disable this with a remote-exec in terraform? that way I use the same *images* for dev/prod, then I customise it for each environment
 
 
 - move from Vercel to Cloudflare pages for startertab
@@ -62,23 +64,26 @@ Can I get this down with containerization and free tiers?
     - [X] accounts
     - [X] edit the PostgreSQL pg_hba.conf file so that it allows logins from localhost so I can take backups [answer](https://chat.openai.com/c/b51fb1c3-42ad-4ec0-ae07-6b261d9d01e3)
     - [X] databases (comes from s3, have a command line or variable to disable this so that it doesn't use too much bandwidth)
-- [ ] how do I do DNS to set this up as a non-prod? 
+- [X] how do I do DNS to set this up as a non-prod? 
 
 - use terraform for the following
   - [X] standing up the image
   - [X] get the IP showing after creation 
   - [X] nbfw create a new rule and attach it
-  - [ ] edit aws route53 to point the non-prod dns entry to the host's IP using provisioners
+  - [X] edit aws route53 to point the non-prod dns entry to the host's IP using provisioners
   - [X] certificates (letsencrypt)
     - [X] generate letsencrypt certs (sudo certbot --nginx)
   - [X] set up nginx for non-prod
   - [X] set up dns records for non-prod using route 53
   - [X] set up certificates
-  - [X] test the sites
+  
+  - get this all working with non-prod front ends
+    - [ ] set up startertab with cloudflare?
     - [ ] how do I manage the non-prods envs linking in with Vercel, I need to get my backend urls from env variables
 
 
 - long term todos/clean ups
+  - [ ] breakdown terraform files into aws and digital ocean
   - [ ] build a diagram to show what these scripts are doing, or just a list
   - [ ] go through and tidy up all hardcoded paths
   - [ ] nginx configs should be split into 3 services

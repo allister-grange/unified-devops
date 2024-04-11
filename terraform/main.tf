@@ -198,7 +198,7 @@ resource "aws_route53_record" "awardit_backend_record" {
 }
 
 # I only want to trigger this whenever the digital ocean droplet is re-built
-resource "null_resource" "install_certs_and_populate_db" {
+resource "null_resource" "install_certs" {
   triggers = {
     key = "${ digitalocean_droplet.web.id }"
   }
@@ -213,9 +213,50 @@ resource "null_resource" "install_certs_and_populate_db" {
   provisioner "remote-exec" {
     inline = [
       "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains ${var.missinglink_domain},${var.awardit_domain}",
-      "sed -i \"s/listen 443 ssl;/listen 443 ssl http2;/g\" /etc/nginx/nginx.conf",
-      "sudo service nginx restart",
+    ]
+  }
+
+  depends_on = [ aws_route53_record.awardit_backend_record, aws_route53_record.missinglink_backend_record ]
+}
+
+resource "null_resource" "turn_on_h2" {
+  triggers = {
+    key = "${ digitalocean_droplet.web.id }"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.web.ipv4_address
+    private_key = file("~/.ssh/id_rsa")
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sed -i \"s/listen 443 ssl;/listen 443 ssl http2;/g\" /etc/nginx/nginx.conf && service nginx restart",
+    ]
+  }
+
+  depends_on = [ null_resource.install_certs ]
+}
+
+resource "null_resource" "populate_db_with_latest_data" {
+  triggers = {
+    key = "${ digitalocean_droplet.web.id }"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.web.ipv4_address
+    private_key = file("~/.ssh/id_rsa")
+  }
+
+  provisioner "remote-exec" {
+    inline = [
       "bash /home/deployer/missinglink-updates.sh"
     ]
   }
+
+  depends_on = [ digitalocean_volume_attachment.missinglink_db_volume_attachment ]
 }
