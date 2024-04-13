@@ -29,6 +29,11 @@ variable "awardit_domain" {
   default = "qa.backend.awardit.info"
 }
 
+variable "umami_domain" {
+  description = "domain for the umami"
+  default = "qa.umami.startertab.com"
+}
+
 variable "env" {
   description = "env that is being run, by default it's dev"
   default = "dev"
@@ -190,7 +195,21 @@ resource "aws_route53_zone" "awardit_zone" {
 
 resource "aws_route53_record" "awardit_backend_record" {
   zone_id = aws_route53_zone.awardit_zone.zone_id
-  name    = var.awardit_domain
+  name    = var.awardit_domain  
+  type    = "A"
+  ttl     = "300"
+  records = ["${digitalocean_droplet.web.ipv4_address}"]
+  depends_on = [ digitalocean_droplet.web ]
+}
+
+# StarterTab zone
+resource "aws_route53_zone" "startertab_zone" {
+  name = "startertab.com"
+}
+
+resource "aws_route53_record" "umami_record" {
+  zone_id = aws_route53_zone.startertab_zone.zone_id
+  name    = var.umami_domain
   type    = "A"
   ttl     = "300"
   records = ["${digitalocean_droplet.web.ipv4_address}"]
@@ -212,7 +231,7 @@ resource "null_resource" "install_certs" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains ${var.missinglink_domain},${var.awardit_domain}",
+      "sudo certbot --nginx --non-interactive --agree-tos -m allistergrange@gmail.com --domains ${var.missinglink_domain},${var.awardit_domain},${var.umami_domain}",
     ]
   }
 

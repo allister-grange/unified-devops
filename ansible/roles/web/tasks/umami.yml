@@ -1,0 +1,26 @@
+- name: clone down umami
+  git:
+    repo: "{{ umami_repo_url }}"
+    dest: "{{ umami_dest_path }}"
+    clone: yes
+    update: yes
+
+- name: install pm2
+  ansible.builtin.shell:
+    cmd: npm install pm2 -g
+    executable: /bin/bash
+
+- name: install node modules
+  ansible.builtin.shell:
+    cmd: |
+      cd {{ umami_dest_path }} &&
+      npm i --force
+    executable: /bin/bash
+
+- name: start up umami
+  ansible.builtin.shell:
+    cmd: |
+      cd {{ umami_dest_path }} &&
+      pm2 start npm --name umami -- start &&
+      pm2 save
+    executable: /bin/bash

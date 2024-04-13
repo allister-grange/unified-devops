@@ -4,6 +4,9 @@ missinglink_dest_path: /home/deployer/missinglink
 awardit_repo_url: https://github.com/allister-grange/awardit.git
 awardit_dest_path: /home/deployer/awardit-backend
 
+umami_repo_url: https://github.com/umami-software/umami.git
+umami_dest_path: /home/deployer/umami
+
 swap_file_path: /swapfile
 swap_file_size: 1G
 swappiness_value: 60

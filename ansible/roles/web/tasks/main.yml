@@ -1,8 +1,11 @@
-- name: include tasks for setting up awardit
+- name: import tasks for setting up awardit
   ansible.builtin.import_tasks: awardit.yml
 
-- name: include tasks for setting up missinglink
+- name: import tasks for setting up missinglink
   ansible.builtin.import_tasks: missinglink.yml
+
+- name: import tasks for setting up umami
+  ansible.builtin.import_tasks: umami.yml
 
 - name: include setting up certificates
   ansible.builtin.import_tasks: certificates.yml
