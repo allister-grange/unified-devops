@@ -7,20 +7,35 @@
 
 - name: install pm2
   ansible.builtin.shell:
-    cmd: npm install pm2 -g
-    executable: /bin/bash
+    cmd: npm install pm2 yarn -g
 
-- name: install node modules
+- name: install node modules for umami
   ansible.builtin.shell:
     cmd: |
       cd {{ umami_dest_path }} &&
-      npm i --force
-    executable: /bin/bash
+      yarn install
 
-- name: start up umami
+- name: configure umami to use the local db
   ansible.builtin.shell:
     cmd: |
       cd {{ umami_dest_path }} &&
-      pm2 start npm --name umami -- start &&
-      pm2 save
-    executable: /bin/bash
+      echo DATABASE_URL=postgresql://{{ lookup('env', 'UMAMI_DATABASE_KEY') }}@localhost:5432/umami > .env
+
+# Umami requires a db connection to build.... so the following is being done the terraform stage as a remote exec post db restoration
+# keeping the below so I know what is going on
+
+# - name: build umami
+#   ansible.builtin.shell:
+#     cmd: |
+#       cd {{ umami_dest_path }} &&
+#       export NODE_OPTIONS=--max-old-space-size=512 &&
+#       cat ./.env &&
+#       yarn build
+
+# - name: start up umami
+#   ansible.builtin.shell:
+#     cmd: |
+#       cd {{ umami_dest_path }} &&
+#       pm2 start npm --name umami -- start &&
+#       pm2 startup &&
+#       pm2 save

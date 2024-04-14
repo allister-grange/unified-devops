@@ -279,3 +279,30 @@ resource "null_resource" "populate_db_with_latest_data" {
 
   depends_on = [ digitalocean_volume_attachment.missinglink_db_volume_attachment ]
 }
+
+# must be done on the deploy stage as umami needs a live db connection to build
+resource "null_resource" "build_and_start_up_umami" {
+  triggers = {
+    key = "${ digitalocean_droplet.web.id }"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.web.ipv4_address
+    private_key = file("~/.ssh/id_rsa")
+  }  
+
+  provisioner "remote-exec" {
+    inline = [
+      "cd /home/deployer/umami",
+      "export NODE_OPTIONS=--max-old-space-size=512",
+      "yarn build",
+      "pm2 start npm --name umami -- start",
+      "pm2 startup",
+      "pm2 save" 
+    ]
+  }
+
+    depends_on = [ null_resource.populate_db_with_latest_data ]
+}
