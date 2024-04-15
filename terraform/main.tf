@@ -9,6 +9,11 @@ terraform {
       version = "~> 5.0"
     }
   }
+  backend "s3" {
+    bucket = "unified-devops-terraform-state"
+    key    = "terraform.tfstate"
+    region = "ap-southeast-2"
+  }
 }
 
 provider "digitalocean" {
@@ -21,22 +26,22 @@ provider "aws" {
 
 variable "missinglink_domain" {
   description = "domain for the missinglink backend"
-  default = "qa.backend.missinglink.link"
+  default     = "qa.backend.missinglink.link"
 }
 
 variable "awardit_domain" {
   description = "domain for the awardit backend"
-  default = "qa.backend.awardit.info"
+  default     = "qa.backend.awardit.info"
 }
 
 variable "umami_domain" {
   description = "domain for the umami"
-  default = "qa.umami.startertab.com"
+  default     = "qa.umami.startertab.com"
 }
 
 variable "env" {
   description = "env that is being run, by default it's dev"
-  default = "dev"
+  default     = "dev"
 }
 
 data "digitalocean_ssh_key" "ssh_key" {
@@ -179,12 +184,12 @@ resource "aws_route53_zone" "missinglink_zone" {
 }
 
 resource "aws_route53_record" "missinglink_backend_record" {
-  zone_id = aws_route53_zone.missinglink_zone.zone_id
-  name    = var.missinglink_domain
-  type    = "A"
-  ttl     = "300"
-  records = ["${digitalocean_droplet.web.ipv4_address}"]
-  depends_on = [ digitalocean_droplet.web ]
+  zone_id    = aws_route53_zone.missinglink_zone.zone_id
+  name       = var.missinglink_domain
+  type       = "A"
+  ttl        = "300"
+  records    = ["${digitalocean_droplet.web.ipv4_address}"]
+  depends_on = [digitalocean_droplet.web]
 
 }
 
@@ -194,12 +199,12 @@ resource "aws_route53_zone" "awardit_zone" {
 }
 
 resource "aws_route53_record" "awardit_backend_record" {
-  zone_id = aws_route53_zone.awardit_zone.zone_id
-  name    = var.awardit_domain  
-  type    = "A"
-  ttl     = "300"
-  records = ["${digitalocean_droplet.web.ipv4_address}"]
-  depends_on = [ digitalocean_droplet.web ]
+  zone_id    = aws_route53_zone.awardit_zone.zone_id
+  name       = var.awardit_domain
+  type       = "A"
+  ttl        = "300"
+  records    = ["${digitalocean_droplet.web.ipv4_address}"]
+  depends_on = [digitalocean_droplet.web]
 }
 
 # StarterTab zone
@@ -208,18 +213,18 @@ resource "aws_route53_zone" "startertab_zone" {
 }
 
 resource "aws_route53_record" "umami_record" {
-  zone_id = aws_route53_zone.startertab_zone.zone_id
-  name    = var.umami_domain
-  type    = "A"
-  ttl     = "300"
-  records = ["${digitalocean_droplet.web.ipv4_address}"]
-  depends_on = [ digitalocean_droplet.web ]
+  zone_id    = aws_route53_zone.startertab_zone.zone_id
+  name       = var.umami_domain
+  type       = "A"
+  ttl        = "300"
+  records    = ["${digitalocean_droplet.web.ipv4_address}"]
+  depends_on = [digitalocean_droplet.web]
 }
 
 # I only want to trigger this whenever the digital ocean droplet is re-built
 resource "null_resource" "install_certs" {
   triggers = {
-    key = "${ digitalocean_droplet.web.id }"
+    key = "${digitalocean_droplet.web.id}"
   }
 
   connection {
@@ -235,12 +240,12 @@ resource "null_resource" "install_certs" {
     ]
   }
 
-  depends_on = [ aws_route53_record.awardit_backend_record, aws_route53_record.missinglink_backend_record ]
+  depends_on = [aws_route53_record.awardit_backend_record, aws_route53_record.missinglink_backend_record]
 }
 
 resource "null_resource" "turn_on_h2" {
   triggers = {
-    key = "${ digitalocean_droplet.web.id }"
+    key = "${digitalocean_droplet.web.id}"
   }
 
   connection {
@@ -256,12 +261,12 @@ resource "null_resource" "turn_on_h2" {
     ]
   }
 
-  depends_on = [ null_resource.install_certs ]
+  depends_on = [null_resource.install_certs]
 }
 
 resource "null_resource" "populate_db_with_latest_data" {
   triggers = {
-    key = "${ digitalocean_droplet.web.id }"
+    key = "${digitalocean_droplet.web.id}"
   }
 
   connection {
@@ -277,13 +282,13 @@ resource "null_resource" "populate_db_with_latest_data" {
     ]
   }
 
-  depends_on = [ digitalocean_volume_attachment.missinglink_db_volume_attachment ]
+  depends_on = [digitalocean_volume_attachment.missinglink_db_volume_attachment]
 }
 
 # must be done on the deploy stage as umami needs a live db connection to build
 resource "null_resource" "build_and_start_up_umami" {
   triggers = {
-    key = "${ digitalocean_droplet.web.id }"
+    key = "${digitalocean_droplet.web.id}"
   }
 
   connection {
@@ -291,7 +296,7 @@ resource "null_resource" "build_and_start_up_umami" {
     user        = "root"
     host        = digitalocean_droplet.web.ipv4_address
     private_key = file("~/.ssh/id_rsa")
-  }  
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -300,9 +305,28 @@ resource "null_resource" "build_and_start_up_umami" {
       "yarn build",
       "pm2 start npm --name umami -- start",
       "pm2 startup",
-      "pm2 save" 
+      "pm2 save"
     ]
   }
 
-    depends_on = [ null_resource.populate_db_with_latest_data ]
+  depends_on = [null_resource.populate_db_with_latest_data]
+}
+
+resource "null_resource" "disable_db_backups" {
+  count = var.env != "prod" ? 1 : 0
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.web.ipv4_address
+    private_key = file("~/.ssh/id_rsa")
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sed -i '/0 \\*\\/6 \\* \\* \\* \\/home\\/deployer\\/backup_db\\.sh/d' /etc/crontab"
+    ]
+  }
+
+  depends_on = [digitalocean_droplet.web]
 }
