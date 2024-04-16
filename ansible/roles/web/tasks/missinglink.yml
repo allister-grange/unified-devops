@@ -13,13 +13,13 @@
 - name: build missinglink
   ansible.builtin.shell:
     cmd: |
-      cd /home/deployer/missinglink/backend/MissingLink.Api/ &&
+      cd {{ missinglink_dest_path }}/backend/MissingLink.Api/ &&
       dotnet publish -c "Release"
 
 - name: setup appsettings.json for missinglink
   ansible.builtin.shell:
     cmd: |
-      cd /home/deployer/missinglink/backend/MissingLink.Api/ &&
+      cd {{ missinglink_dest_path }}/backend/MissingLink.Api/ &&
       sed -i "s/Host=localhost;Database=<YOUR-DB-NAME-HERE>;Username=<YOUR-DB-USERNAME-HERE>;Password=<YOUR-DB-PASS-HERE>/{{ lookup('env', 'POSTGRES_CONNECTION_STRING') }}/g" ./appsettings.json &&
       sed -i "s/<METLINK-API-KEY>/{{ lookup('env', 'METLINK_API_KEY') }}/g" ./appsettings.json &&
       sed -i "s/<AT-API-KEY-1>/{{ lookup('env', 'ATAPIKEY1') }}/g" ./appsettings.json &&
@@ -27,7 +27,7 @@
       sed -i "s/<YOUR-REDIS-DB-HERE>/{{ lookup('env', 'REDIS_HOST') }}/g" ./appsettings.json
 
 - name: Check the POSTGRES_CONNECTION_STRING value in appsettings.json
-  ansible.builtin.command: jq -r '.ConnectionStrings.Postgres' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  ansible.builtin.command: jq -r '.ConnectionStrings.Postgres' {{ missinglink_dest_path }}/missinglink/backend/MissingLink.Api/appsettings.json
   register: postgres_conn_str
 
 - name: Assert POSTGRES_CONNECTION_STRING is not empty or default
@@ -37,7 +37,7 @@
       - postgres_conn_str.stdout != "Host=localhost;Database=<YOUR-DB-NAME-HERE>;Username=<YOUR-DB-USERNAME-HERE>;Password=<YOUR-DB-PASS-HERE>"
 
 - name: Check the METLINK-API-KEY value in appsettings.json
-  ansible.builtin.shell: jq -r '.MetlinkApiConfig.MetlinkApiKey' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  ansible.builtin.shell: jq -r '.MetlinkApiConfig.MetlinkApiKey' {{ missinglink_dest_path }}/backend/MissingLink.Api/appsettings.json
   register: metlink_api_key
 
 - name: Assert METLINK-API-KEY is not empty or default
@@ -47,7 +47,7 @@
       - metlink_api_key.stdout != "<METLINK_API_KEY>"
 
 - name: Check the AT-API-KEY-1 value in appsettings.json
-  ansible.builtin.shell: jq -r '.AtApiConfig.AtApiKey1' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  ansible.builtin.shell: jq -r '.AtApiConfig.AtApiKey1' {{ missinglink_dest_path }}/backend/MissingLink.Api/appsettings.json
   register: at_api_key_1
 
 - name: Assert AT-API-KEY-1 is not empty or default
@@ -57,7 +57,7 @@
       - at_api_key_1.stdout != "<AT-API-KEY-1>"
 
 - name: Check the AT-API-KEY-2 value in appsettings.json
-  ansible.builtin.shell: jq -r '.AtApiConfig.AtApiKey2' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  ansible.builtin.shell: jq -r '.AtApiConfig.AtApiKey2' {{ missinglink_dest_path }}/backend/MissingLink.Api/appsettings.json
   register: at_api_key_2
 
 - name: Assert AT-API-KEY-2 is not empty or default
@@ -67,7 +67,7 @@
       - at_api_key_2.stdout != "<AT-API-KEY-2>"
 
 - name: Check the redis connection value in appsettings.json
-  ansible.builtin.shell: jq -r '.ConnectionStrings.Redis' /home/deployer/missinglink/backend/MissingLink.Api/appsettings.json
+  ansible.builtin.shell: jq -r '.ConnectionStrings.Redis' {{ missinglink_dest_path }}/backend/MissingLink.Api/appsettings.json
   register: at_api_key_2
 
 - name: Assert redis connection value is not empty or default
@@ -75,6 +75,21 @@
     that:
       - at_api_key_2.stdout != ""
       - at_api_key_2.stdout != "<YOUR-REDIS-DB-HERE>"
+
+- name: copy over missinglink shell script for creating statistics
+  ansible.builtin.template:
+    src: missinglink-updates.sh
+    dest: "{{ missinglink_dest_path }}/missinglink-updates.sh"
+    owner: deployer
+    group: deployer
+    mode: "0777"
+
+- name: setup cron job for calling missinglink backend
+  ansible.builtin.cron:
+    name: "call missinglink updates api endpoint"
+    minute: "0,15,30,45"
+    job: "sh {{ missinglink_dest_path }}/missinglink-updates.sh"
+    user: "root"
 
 - name: setup systemd file for missinglink
   ansible.builtin.template:

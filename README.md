@@ -26,15 +26,16 @@ Can I get this down with containerization and free tiers?
 
 ## next steps
 
+- to test on next boot
+  - only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
+    - should be deleted out of crontab
+  - move all install paths to /srv/www
+  - all sites should work
+  - review all nginx confs
+
 - next action 
-  - [ ] test umami installation
-    - [ ] 502 bad gateway on the frontned 
-    - [ ] the node packages take wayyy to long to download / install - can I speed this up?
-  - [ ] I want all non-prod/prod distinctions to be made in Terraform, not ansible. Ansible is to set up a common image with packer. This image is then shared across the environments with light tuning. 
-    - [ ] go through all of ansible and determine if I need anything turned off in non-prod
-      - [ ] only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
-        - [ ] should I just disable this with a remote-exec in terraform?
-  - [ ] store terraform state in an s3 bucket
+  - get the var file included in ansible, then run the thing and test the above
+
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
@@ -83,15 +84,6 @@ Can I get this down with containerization and free tiers?
 
 
 - long term todos/clean ups
-  - [ ] breakdown terraform files into aws and digital ocean
   - [ ] build a diagram to show what these scripts are doing, or just a list
-  - [ ] go through and tidy up all hardcoded paths
   - [ ] nginx configs should be split into 3 services
-  - [ ] can I merge group_vars and the vars folders?
   - [ ] I need to know if the database backups into s3 fail somehow, scripts?
-  - [ ] separate out prod/non-prod builds
-    - [ ] only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
-    - [ ] domain names should be sorted by prod/non-prod
-  - [ ] move all install paths to /opt/ (find best practise using LLM tools)
-  - [ ] go through and put variables in for all paths etc in ansible
-  - [ ] review all nginx confs, best practise?

@@ -1,11 +1,11 @@
 missinglink_repo_url: https://github.com/allister-grange/missinglink.git
-missinglink_dest_path: /home/deployer/missinglink
+missinglink_dest_path: /srv/www/missinglink
 
 awardit_repo_url: https://github.com/allister-grange/awardit.git
-awardit_dest_path: /home/deployer/awardit-backend
+awardit_dest_path: /srv/www/awardit-backend
 
 umami_repo_url: https://github.com/umami-software/umami.git
-umami_dest_path: /home/deployer/umami
+umami_dest_path: /srv/www/umami
 
 swap_file_path: /swapfile
 swap_file_size: 1G
@@ -14,3 +14,5 @@ swappiness_value: 60
 aws_access_key_id: "your_access_key_id"
 aws_secret_access_key: "your_secret_access_key"
 aws_default_region: "your_default_region"
+
+backup_script_dest_path: "/home/deployer"

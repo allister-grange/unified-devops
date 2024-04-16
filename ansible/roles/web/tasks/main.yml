@@ -9,3 +9,7 @@
 
 - name: include setting up certificates
   ansible.builtin.import_tasks: certificates.yml
+
+- name: reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true

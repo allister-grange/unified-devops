@@ -3,13 +3,6 @@
     name: nginx
     state: present
 
-- name: ensure nginx is enabled and will start on boot
-  ansible.builtin.systemd:
-    name: nginx
-    enabled: yes
-    state: started
-
-# deploy my configuration file for nginx, todo this won't work because it's missing certificates
 - name: copy over my nginx.conf file
   ansible.builtin.template:
     src: nginx.conf.h2
@@ -17,3 +10,9 @@
     owner: root
     group: root
     mode: "0644"
+
+- name: ensure nginx is enabled and will start on boot
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: yes
+    state: started

@@ -33,14 +33,15 @@
 - name: copy over the backup script
   ansible.builtin.template:
     src: backup_db.sh.h2
-    dest: /home/deployer/backup_db.sh
+    dest: "{{ backup_script_dest_path }}/backup_db.sh"
     owner: root
     group: root
     mode: "0700"
-# TODO only push up backups if this is prod
-# - name: set up the cronjob to run the backup once every 6 hours
-#   ansible.builtin.cron:
-#     name: "backing up dbs every 6 hours"
-#     hour: "*/6"
-#     job: "sh /home/deployer/backup_db.sh"
-#     user: "root"
+
+# this is disabled in all productions that aren't 'prod' in
+- name: set up the cronjob to run the backup once every 6 hours
+  ansible.builtin.cron:
+    name: "backing up dbs every 6 hours"
+    hour: "*/6"
+    job: "sh {{ backup_script_dest_path }}/backup_db.sh"
+    user: "root"
