@@ -24,6 +24,14 @@ A repo that can set up all of my applications (presently, AwardIt, personal site
 
 Can I get this down with containerization and free tiers? 
 
+
+
+## what does this codebase do?
+
+- sets up an ubuntu image using packer
+- configures that image with ansible
+- deploys that image, among other things using terraform
+
 ## next steps
 
 - to test on next boot
@@ -34,8 +42,8 @@ Can I get this down with containerization and free tiers?
   - review all nginx confs
 
 - next action 
-  - get the var file included in ansible, then run the thing and test the above
-
+  - start working on getting Cloudflare working for StarterTab front end
+  - test the above once my fricken cert change quota has dropped (17/04 I wrote this)
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
@@ -85,5 +93,7 @@ Can I get this down with containerization and free tiers?
 
 - long term todos/clean ups
   - [ ] build a diagram to show what these scripts are doing, or just a list
-  - [ ] nginx configs should be split into 3 services
+  - [ ] clean up this README as a piece of documentation
   - [ ] I need to know if the database backups into s3 fail somehow, scripts?
+  - [ ] hosting and deployment of the awardit front end
+  - [ ] hosting and deployment of allistergrange.com front end

@@ -27,7 +27,7 @@
       sed -i "s/<YOUR-REDIS-DB-HERE>/{{ lookup('env', 'REDIS_HOST') }}/g" ./appsettings.json
 
 - name: Check the POSTGRES_CONNECTION_STRING value in appsettings.json
-  ansible.builtin.command: jq -r '.ConnectionStrings.Postgres' {{ missinglink_dest_path }}/missinglink/backend/MissingLink.Api/appsettings.json
+  ansible.builtin.command: jq -r '.ConnectionStrings.Postgres' {{ missinglink_dest_path }}/backend/MissingLink.Api/appsettings.json
   register: postgres_conn_str
 
 - name: Assert POSTGRES_CONNECTION_STRING is not empty or default

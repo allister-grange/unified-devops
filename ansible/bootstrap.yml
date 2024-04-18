@@ -1,23 +1,31 @@
 - name: set up the system's base, a user for deploying and common tools
   hosts: all
   remote_user: root
+  vars_files:
+    - global_vars.yml
   roles:
     - common
 
 - name: install and configure nginx
   hosts: all
   remote_user: root
+  vars_files:
+    - global_vars.yml
   roles:
     - nginx
 
 - name: deploy postgres, redis and configure the databases
   hosts: all
   remote_user: root
+  vars_files:
+    - global_vars.yml
   roles:
     - db
 
 - name: configure and deploy the webservers and application code
   hosts: all
   remote_user: root
+  vars_files:
+    - global_vars.yml
   roles:
     - web

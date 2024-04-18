@@ -78,7 +78,7 @@ resource "null_resource" "populate_db_with_latest_data" {
 
   provisioner "remote-exec" {
     inline = [
-      "bash /home/deployer/missinglink-updates.sh"
+      "bash /srv/www/missinglink/missinglink-updates.sh"
     ]
   }
 
@@ -100,7 +100,7 @@ resource "null_resource" "build_and_start_up_umami" {
 
   provisioner "remote-exec" {
     inline = [
-      "cd /home/deployer/umami",
+      "cd /srv/www/umami",
       "export NODE_OPTIONS=--max-old-space-size=512",
       "yarn build",
       "pm2 start npm --name umami -- start",
