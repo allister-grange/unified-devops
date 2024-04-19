@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=root
-WorkingDirectory=/home/deployer/awardit_backend/AwardIt/api
+WorkingDirectory={{ awardit_dest_path }}/api
 ExecStart=/usr/bin/npm start
 Restart=always
 RestartSec=3

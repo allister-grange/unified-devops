@@ -109,7 +109,7 @@ resource "null_resource" "build_and_start_up_umami" {
     ]
   }
 
-  depends_on = [null_resource.populate_db_with_latest_data]
+  depends_on = [digitalocean_volume_attachment.missinglink_db_volume_attachment]
 }
 
 resource "null_resource" "disable_db_backups" {

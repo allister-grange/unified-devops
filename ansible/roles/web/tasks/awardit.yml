@@ -19,6 +19,14 @@
     group: root
     mode: "0644"
 
+- name: setup .env file for awardit
+  ansible.builtin.template:
+    src: awardit_env.j2
+    dest: "{{ awardit_dest_path }}/api/.env"
+    owner: root
+    group: root
+    mode: "0600"
+
 - name: enable awardit in systemd
   ansible.builtin.systemd_service:
     name: awardit
