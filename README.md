@@ -34,16 +34,11 @@ Can I get this down with containerization and free tiers?
 
 ## next steps
 
-- to test on next boot
-  - only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
-    - should be deleted out of crontab
-  - move all install paths to /srv/www
-  - all sites should work
-  - review all nginx confs
 
 - next action 
+  - only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
+    - should be deleted out of crontab, isn't
   - start working on getting Cloudflare working for StarterTab front end
-  - test the above once my fricken cert change quota has dropped (17/04 I wrote this)
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison

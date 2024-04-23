@@ -112,7 +112,12 @@ resource "null_resource" "build_and_start_up_umami" {
   depends_on = [digitalocean_volume_attachment.missinglink_db_volume_attachment]
 }
 
+# remove the backup job for the database if the env isn't prod
 resource "null_resource" "disable_db_backups" {
+  triggers = {
+    key = "${digitalocean_droplet.web.id}"
+  }
+
   count = var.env != "prod" ? 1 : 0
 
   connection {
@@ -124,7 +129,7 @@ resource "null_resource" "disable_db_backups" {
 
   provisioner "remote-exec" {
     inline = [
-      "sed -i '/0 \\*\\/6 \\* \\* \\* \\/home\\/deployer\\/backup_db\\.sh/d' /etc/crontab"
+      "crontab -l | sed '2 s/^/#/g' | crontab -"
     ]
   }
 
