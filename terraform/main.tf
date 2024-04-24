@@ -129,7 +129,7 @@ resource "null_resource" "disable_db_backups" {
 
   provisioner "remote-exec" {
     inline = [
-      "crontab -l | sed '2 s/^/#/g' | crontab -"
+      "crontab -l | grep -v 'home/deployer/backup_db.sh' | crontab -"
     ]
   }
 
