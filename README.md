@@ -10,6 +10,15 @@ A repo that can set up all of my applications (presently, AwardIt, personal site
 - packer
 - terraform
 
+## applications
+
+| application                                      | frontend         | backend                      | database                  |
+| ------------------------------------------------ | ---------------- | ---------------------------- | ------------------------- |
+| [startertab](https://startertab.com/landingpad)  | nextjs on vercel | next js api routes on vercel | postgres on neon          |
+| [awardit](https://awardit.info/)                 | react on aws s3  | ubuntu vm on digital ocean   | postgres on digital ocean |
+| [missinglink](https://www.missinglink.link)      | react on vercel  | next js api routes on vercel | postgres on digital ocean |
+| [personal site](https://www.allistergrange.com/) | nextjs on vercel | n/a                          | n/a                       |
+
 ## pie in the sky
 
 - non-prod environments for all sites
