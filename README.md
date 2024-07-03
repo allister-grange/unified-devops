@@ -6,9 +6,33 @@ A repo that can set up all of my applications (presently, AwardIt, personal site
 
 ## tools and technologies
 
-- kubernetes
 - packer
 - terraform
+- ansible
+
+## how to run the scripts
+
+```bash
+# export the following environment line variables for packer secrets
+export DIGITALOCEAN_API_KEY=''
+export METLINK_API_KEY=''
+export POSTGRES_CONNECTION_STRING=''
+export ATAPIKEY1=''
+export ATAPIKEY2=''
+export REDIS_HOST=''
+export UMAMI_DATABASE_KEY=''
+export AWARDIT_DB_PASS=''
+export AWARDIT_DB_HOST=''
+export AWARDIT_DB_USER=''
+
+packer init ./main.pkr.hcl
+
+# build the packer file, pull out the packer image ID from the CLI
+
+
+# deploy the packer file with terraform
+
+```
 
 ## applications
 
@@ -33,8 +57,6 @@ A repo that can set up all of my applications (presently, AwardIt, personal site
 
 Can I get this down with containerization and free tiers? 
 
-
-
 ## what does this codebase do?
 
 - sets up an ubuntu image using packer
@@ -43,11 +65,10 @@ Can I get this down with containerization and free tiers?
 
 ## next steps
 
-
 - next action 
   - only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
     - should be deleted out of crontab, isn't
-  - start working on getting Cloudflare working for StarterTab front end
+
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
@@ -90,11 +111,6 @@ Can I get this down with containerization and free tiers?
   - [X] set up dns records for non-prod using route 53
   - [X] set up certificates
   
-  - get this all working with non-prod front ends
-    - [ ] set up startertab with cloudflare?
-    - [ ] how do I manage the non-prods envs linking in with Vercel, I need to get my backend urls from env variables
-
-
 - long term todos/clean ups
   - [ ] build a diagram to show what these scripts are doing, or just a list
   - [ ] clean up this README as a piece of documentation
