@@ -1,8 +1,10 @@
 # unified-devops
 
-## what I want this to be
+A repo to stand up an environment for my applications, presently: AwardIt, personal site, MissingLink, StarterTab, Umami
 
-A repo that can set up all of my applications (presently, AwardIt, personal site, MissingLink, StarterTab, Umami) in the cloud, keeping in mind the concept 'cattle, not pets'
+Following the "cattle, not pets" reasoning, this repo can stand up and cut over all of my applications in 20 minutes
+
+This includes tasks such as DNS set up, the creation of a large database that is then backed up once every few hours with an S3 bucket, and setting up a hardened vm
 
 ## tools and technologies
 
@@ -32,9 +34,10 @@ packer validate . &&
 packer build .
 
 # deploy the packer file with terraform (requires you to be logged into aws on the cli)
-terraform plan -var "digital_ocean_api_token=<TOKEN>" -var "packer_image_id=<PACKER-IMAGE-ID>"
-
-
+terraform apply \
+  -var "digital_ocean_api_token=<TOKEN>" \
+  -var "packer_image_id=<PACKER-IMAGE-ID>" \
+  -var "env=<prod | dev>"
 ```
 
 ## applications
@@ -46,11 +49,6 @@ terraform plan -var "digital_ocean_api_token=<TOKEN>" -var "packer_image_id=<PAC
 | [missinglink](https://www.missinglink.link)      | react on vercel  | next js api routes on vercel | postgres on digital ocean |
 | [personal site](https://www.allistergrange.com/) | nextjs on vercel | n/a                          | n/a                       |
 
-## pie in the sky
-
-- non-prod environments for all sites
-- taking backups for my dbs into an s3 bucket (configured and stood up with Terraform)
-- I should be able to able to bootstrap all my websites from these scripts with minimal click-ops (exceptions for things like dns)
 
 ## current baseline spending for a typical month (usd)
 
@@ -67,11 +65,6 @@ Can I get this down with containerization and free tiers?
 - deploys that image, among other things using terraform
 
 ## next steps
-
-- next action 
-  - only push up the DB backups if it's PROD, don't take the backup scripts if I am doing a non-prod build
-    - should be deleted out of crontab, isn't
-
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
