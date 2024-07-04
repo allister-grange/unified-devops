@@ -25,12 +25,15 @@ export AWARDIT_DB_PASS=''
 export AWARDIT_DB_HOST=''
 export AWARDIT_DB_USER=''
 
-packer init ./main.pkr.hcl
+# init the project, build the packer file, pull out the packer image ID from the CLI
+cd packer &&
+packer init . &&
+packer validate . &&
+packer build .
 
-# build the packer file, pull out the packer image ID from the CLI
+# deploy the packer file with terraform (requires you to be logged into aws on the cli)
+terraform plan -var "digital_ocean_api_token=<TOKEN>" -var "packer_image_id=<PACKER-IMAGE-ID>"
 
-
-# deploy the packer file with terraform
 
 ```
 
