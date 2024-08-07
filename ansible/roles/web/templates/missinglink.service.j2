@@ -3,7 +3,7 @@ Description=MissingLink
 
 [Service]
 WorkingDirectory={{ missinglink_dest_path }}/backend/MissingLink.Api
-ExecStart=/usr/bin/dotnet {{ missinglink_dest_path }}/backend/MissingLink.Api/bin/Release/net6.0/missinglink.dll
+ExecStart=/usr/bin/dotnet {{ missinglink_dest_path }}/backend/MissingLink.Api/bin/Release/net8.0/missinglink.dll
 Restart=always
 RestartSec=10  # Restart service after 10 seconds if the dotnet service crashes
 SyslogIdentifier=missinglink

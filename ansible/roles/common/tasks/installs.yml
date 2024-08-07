@@ -12,7 +12,7 @@
       - jq
       - tmux
       - awscli
-      - dotnet-sdk-6.0
+      - dotnet-sdk-8.0
     state: present
 
 - name: install node
