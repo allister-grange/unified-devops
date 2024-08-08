@@ -30,13 +30,11 @@
     name: postgresql
     state: restarted
 
-- name: copy over the backup script
-  ansible.builtin.template:
-    src: backup_db.sh.h2
-    dest: "{{ backup_script_dest_path }}/backup_db.sh"
-    owner: root
-    group: root
-    mode: "0700"
+- name: ensure backup directory exists and has appropriate permissions
+  ansible.builtin.file:
+    path: /mnt/volume_missinglink_db/backup
+    state: directory
+    mode: "0777"
 
 # this is disabled in all productions that aren't 'prod' in
 - name: set up the cronjob to run the backup once every 6 hours

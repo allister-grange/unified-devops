@@ -1,13 +1,13 @@
 #!/bin/bash
 timestamp=$(date +%Y%m%d%H)
-BACKUP_DIR="/mnt/volume_missinglink_db"
+BACKUP_DIR="/mnt/volume_missinglink_db/backup"
 BACKUP_FILE="$BACKUP_DIR/db_backup_$timestamp.sql"
 
 # Perform database backup
 pg_dumpall -c -U grangeal -f "$BACKUP_FILE"
 
 # Sync backup to S3
-aws s3 sync "$BACKUP_DIR" "s3://unified-devops-db-backups/" 
+aws s3 sync "$BACKUP_DIR" "s3://unified-devops-db-backups/"
 
 # Delete the backup to save space
 rm "$BACKUP_FILE"
