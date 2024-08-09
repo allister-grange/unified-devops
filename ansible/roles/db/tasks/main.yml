@@ -18,6 +18,11 @@
     state: started
     enabled: yes
 
+- name: stop postgres to make changes to the default db location
+  ansible.builtin.service:
+    name: postgresql
+    state: stopped
+
 - name: give root login permissions to the db
   ansible.builtin.shell:
     cmd: |
@@ -25,16 +30,29 @@
       sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" /etc/postgresql/14/main/pg_hba.conf
       sed -i "s/local   all             postgres                                peer/local   all             postgres                                trust/" /etc/postgresql/14/main/pg_hba.conf
 
-- name: restart postgres to lock in permission changes
-  ansible.builtin.service:
-    name: postgresql
-    state: restarted
-
 - name: ensure backup directory exists and has appropriate permissions
   ansible.builtin.file:
-    path: /mnt/volume_missinglink_db/backup
+    path: /mnt/volume_missinglink_pg_db/backup
     state: directory
     mode: "0777"
+    group: "postgres"
+    owner: "postgres"
+
+- name: ensure main data directory exists and has appropriate permissions
+  ansible.builtin.file:
+    path: /mnt/volume_missinglink_pg_db/main
+    state: directory
+    mode: "0700"
+    group: "postgres"
+    owner: "postgres"
+
+- name: copy over existing postgres database files into the new folder
+  ansible.builtin.shell: |
+    sudo rsync -av /var/lib/postgresql/14/main /mnt/volume_missinglink_pg_db/
+
+- name: edit the PostgreSQL configuration file to point to the new data directory
+  ansible.builtin.shell: |
+    sed -i "s|data_directory = '/var/lib/postgresql/14/main'|data_directory = '/mnt/volume_missinglink_pg_db/main'|" /etc/postgresql/14/main/postgresql.conf
 
 # this is disabled in all productions that aren't 'prod' in
 - name: set up the cronjob to run the backup once every 6 hours
@@ -43,3 +61,8 @@
     hour: "*/6"
     job: "sh {{ backup_script_dest_path }}/backup_db.sh"
     user: "root"
+
+- name: start postgres
+  ansible.builtin.service:
+    name: postgresql
+    state: started

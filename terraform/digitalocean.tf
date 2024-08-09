@@ -54,14 +54,13 @@ resource "digitalocean_firewall" "web" {
     port_range            = "1-65535"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
-
 }
 
 resource "digitalocean_volume" "missinglink_db_volume" {
   region                  = "syd1"
-  name                    = "missinglink-data"
+  name                    = "volume-missinglink-pg-db"
   initial_filesystem_type = "ext4"
-  size                    = 6
+  size                    = 20
 }
 
 resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {
@@ -83,9 +82,9 @@ resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {
       "latest_file=$(cat /tmp/latest_file.txt)",
       "file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )",
       "echo $file_path/$latest_file",
-      "aws s3 cp s3://unified-devops-db-backups/$latest_file /mnt/$file_path/db_backup.sql",
-      "psql -f /mnt/$file_path/db_backup.sql -U postgres",
-      "rm /mnt/$file_path/db_backup.sql"
+      "aws s3 cp s3://unified-devops-db-backups/$latest_file /mnt/$file_path/backup/db_backup.sql",
+      "psql -f /mnt/$file_path/backup/db_backup.sql -U postgres",
+      "rm /mnt/$file_path/backup/db_backup.sql"
     ]
   }
 }
