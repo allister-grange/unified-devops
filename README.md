@@ -113,3 +113,4 @@ Can I get this down with containerization and free tiers?
   - [ ] I need to know if the database backups into s3 fail somehow, scripts?
   - [ ] hosting and deployment of the awardit front end
   - [ ] hosting and deployment of allistergrange.com front end
+  - [ ] find a way to avoid pulling down node packages for umami - it's too slow in the devops

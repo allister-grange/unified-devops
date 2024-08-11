@@ -74,10 +74,19 @@ resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {
     private_key = file("~/.ssh/id_rsa")
   }
 
-  # log into the remote host and then pull down the latest db backup
-  # then restore all dbs and remove the backup
+  # create the backup and data directories
+  # move over the data from the existing postgres data folder, then edit the config to point to the new directory on the mounted disk
+  # then pull down the latest db backup from the s3 bucket and restore all the dbs 
   provisioner "remote-exec" {
     inline = [
+      "systemctl stop postgresql",
+      "mkdir -p /mnt/volume_missinglink_pg_db/backup /mnt/volume_missinglink_pg_db/main",
+      "chmod 0777 /mnt/volume_missinglink_pg_db/backup",
+      "chmod 0700 /mnt/volume_missinglink_pg_db/main",
+      "chown postgres:postgres /mnt/volume_missinglink_pg_db/backup /mnt/volume_missinglink_pg_db/main",
+      "rsync -av /var/lib/postgresql/14/main /mnt/volume_missinglink_pg_db/",
+      "sed -i \"s|data_directory = '/var/lib/postgresql/14/main'|data_directory = '/mnt/volume_missinglink_pg_db/main'|\" /etc/postgresql/14/main/postgresql.conf",
+      "systemctl start postgresql",
       "aws s3 ls s3://unified-devops-db-backups/ --human-readable | sort | awk '{print $5}' | tail -n 1 > /tmp/latest_file.txt",
       "latest_file=$(cat /tmp/latest_file.txt)",
       "file_path=$(echo ${digitalocean_volume.missinglink_db_volume.name} | tr '-' '_' )",
