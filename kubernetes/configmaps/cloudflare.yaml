@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+data:
+  config.yaml: |
+    tunnel: 5b0a1828-5bf0-4085-9e64-4b88d39da3f0
+    credentials-file: /etc/cloudflared/creds/credentials.json
+    no-autoupdate: true
+    ingress:
+      - hostname: backend.awardit.info
+        service: http://awardit-api-service:3001
+      - service: http_status:404
