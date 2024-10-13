@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: missinglink-api-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: missinglink-api
+  template:
+    metadata:
+      labels:
+        app: missinglink-api
+    spec:
+      containers:
+        - name: missinglink-api
+          image: registry.digitalocean.com/grangeal-container-registry/awardit-api:missinglink-api
+          ports:
+            - containerPort: 5002
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+      imagePullSecrets:
+        - name: regcred
