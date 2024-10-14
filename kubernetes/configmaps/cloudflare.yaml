@@ -8,7 +8,7 @@ data:
     credentials-file: /etc/cloudflared/creds/credentials.json
     no-autoupdate: true
     ingress:
-      - hostname: missinglink.awardit.info
+      - hostname: backend.missinglink.link
         service: http://missinglink-api-service:5002
       - hostname: backend.awardit.info
         service: http://awardit-api-service:3001

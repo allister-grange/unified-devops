@@ -15,6 +15,7 @@ spec:
       containers:
         - name: missinglink-api
           image: registry.digitalocean.com/grangeal-container-registry/awardit-api:missinglink-api
+          imagePullPolicy: Always
           ports:
             - containerPort: 5002
           resources:
