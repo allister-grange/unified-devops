@@ -8,6 +8,8 @@ data:
     credentials-file: /etc/cloudflared/creds/credentials.json
     no-autoupdate: true
     ingress:
+      - hostname: umami.startertab.com
+        service: http://umami-service:3000
       - hostname: backend.missinglink.link
         service: http://missinglink-api-service:5002
       - hostname: backend.awardit.info
