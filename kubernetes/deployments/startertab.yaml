@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: startertab-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: startertab
+  template:
+    metadata:
+      labels:
+        app: startertab
+    spec:
+      containers:
+        - name: startertab
+          image: docker.io/grangeal/startertab:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+      imagePullSecrets:
+        - name: startertab-registry-cred
