@@ -11,7 +11,7 @@ data:
       - hostname: startertab.com
         service: http://startertab-service:3000
       - hostname: qa.startertab.com
-        service: http://startertab-service:3000
+        service: http://startertab-qa-service:3000
       - hostname: umami.startertab.com
         service: http://umami-service:3000
       - hostname: backend.missinglink.link
