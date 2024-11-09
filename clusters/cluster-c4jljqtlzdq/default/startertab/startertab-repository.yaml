@@ -1,0 +1,11 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: startertab
+  namespace: flux-system
+spec:
+  image: docker.io/grangeal/startertab
+  interval: 3m0s
+  secretRef:
+    name: startertab-registry-cred
