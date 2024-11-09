@@ -1,6 +1,6 @@
 #!/bin/bash
 timestamp=$(date +%Y%m%d%H)
-BACKUP_DIR="/mnt/volume_missinglink_db/backup"
+BACKUP_DIR="/mnt/volume_missinglink_pg_db/backup"
 BACKUP_FILE="$BACKUP_DIR/db_backup_$timestamp.sql"
 
 # Perform database backup

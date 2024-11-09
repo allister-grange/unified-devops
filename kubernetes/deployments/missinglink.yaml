@@ -20,7 +20,7 @@ spec:
             - containerPort: 5002
           resources:
             requests:
-              cpu: "250m"
-              memory: "512Mi"
+              cpu: "350m"
+              memory: "300Mi"
       imagePullSecrets:
         - name: regcred

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: awardit-api-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: awardit-api
@@ -19,7 +19,7 @@ spec:
             - containerPort: 3001
           resources:
             requests:
-              cpu: "250m"
-              memory: "512Mi"
+              cpu: "150m"
+              memory: "256Mi"
       imagePullSecrets:
         - name: regcred

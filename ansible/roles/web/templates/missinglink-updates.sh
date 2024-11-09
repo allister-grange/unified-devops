@@ -1,3 +1,3 @@
 #!/bin/bash
 
-curl -X POST "https://localhost:5001/api/v1/updates" -H  "accept: */*" -d "" --insecure
+curl -X POST "http://localhost:5002/api/v1/updates" -H  "accept: */*" -d "" --insecure

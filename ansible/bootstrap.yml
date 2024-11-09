@@ -21,11 +21,11 @@
     - global_vars.yml
   roles:
     - db
-
-- name: configure and deploy the webservers and application code
-  hosts: all
-  remote_user: root
-  vars_files:
-    - global_vars.yml
-  roles:
-    - web
+#### MOVED TO K8S, LEAVING FOR A DR/COST SAVING SITUATION ####
+# - name: configure and deploy the webservers and application code
+#   hosts: all
+#   remote_user: root
+#   vars_files:
+#     - global_vars.yml
+#   roles:
+#     - web
