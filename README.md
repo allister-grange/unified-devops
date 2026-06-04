@@ -27,6 +27,8 @@ export AWARDIT_DB_PASS=''
 export AWARDIT_DB_HOST=''
 export AWARDIT_DB_USER=''
 
+aws login
+
 # init the project, build the packer file, pull out the packer image ID from the CLI
 cd packer &&
 packer init . &&
@@ -40,31 +42,59 @@ terraform apply \
   -var "env=<prod | dev>"
 ```
 
+## helpful scripts
+
+```bash
+# verify db-backups 
+aws s3 ls s3://unified-devops-db-backups
+
+# login to orcale k8s cluster
+export OCI_CLI_AUTH=security_token
+# use ap-sydney-1
+oci session authenticate          
+# make sure that it's pointing to `context-c4jljqtlzdq`
+kubectl config get-contexts
+k9s
+```
+
 ## applications
 
-| application                                      | frontend         | backend                      | database                  |
-| ------------------------------------------------ | ---------------- | ---------------------------- | ------------------------- |
-| [startertab](https://startertab.com/landingpad)  | nextjs on vercel | next js api routes on vercel | postgres on neon          |
-| [awardit](https://awardit.info/)                 | react on aws s3  | ubuntu vm on digital ocean   | postgres on digital ocean |
-| [missinglink](https://www.missinglink.link)      | react on vercel  | next js api routes on vercel | postgres on digital ocean |
-| [personal site](https://www.allistergrange.com/) | nextjs on vercel | n/a                          | n/a                       |
+| application                                      | frontend         | backend                                  | database                  |
+| ------------------------------------------------ | ---------------- | ---------------------------------------- | ------------------------- |
+| [startertab](https://startertab.com/landingpad)  | nextjs on vercel | next js api routes on oracle k8s cluster | postgres on neon          |
+| [awardit](https://awardit.info/)                 | react on aws s3  | ubuntu vm on digital ocean               | postgres on digital ocean |
+| [missinglink](https://www.missinglink.link)      | react on vercel  | next js api routes on oracle k8s cluster | postgres on digital ocean |
+| [personal site](https://www.allistergrange.com/) | nextjs on vercel | n/a                                      | n/a                       |
 
 
 ## current baseline spending for a typical month (usd)
 
-- $20 for Vercel
 - $6 for Digital Ocean
 - $2.5 for AWS
-
-Can I get this down with containerization and free tiers? 
+- free tier of Oracle k8s
 
 ## what does this codebase do?
 
 - sets up an ubuntu image using packer
 - configures that image with ansible
-- deploys that image, among other things using terraform
+- deploys that image, among other things using terraform into Digital Ocean
 
 ## next steps
+
+- [ ] verify I can still build an image using this repo 02/06/2026
+  - [ ] build packer image
+  - [ ] verify that it works with psql16 (I think that the DB needs to be pointed to the volume mount)
+  - [ ] check both the postgres.conf file and the hba_conf to see if they look correct-ish
+- [ ] get production running off of this repo
+- [ ] get everything updated to the latest versions
+  - [ ] psql 16
+- [ ] re-deploy to production with these scripts
+- [ ] get rid of missinglink backend from the ansibl/packer images
+- [ ] move awardit to awardit.allistergrange.com
+
+- [ ] set up alerting for missinglink
+- [ ] run everything under deployer (no grangeal)
+- [ ] consistent logging to file + rotations
 
 - move from Vercel to Cloudflare pages for startertab
   - [ ] get a baseline of speed for comparison
