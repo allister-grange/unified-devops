@@ -81,16 +81,27 @@ k9s
 
 ## next steps
 
+- may need to move to using snap for installing `sudo snap install aws-cli --classic`
+
 - [ ] verify I can still build an image using this repo 02/06/2026
-  - [ ] build packer image
+  - [X] build packer image
   - [ ] verify that it works with psql16 (I think that the DB needs to be pointed to the volume mount)
   - [ ] check both the postgres.conf file and the hba_conf to see if they look correct-ish
-- [ ] get production running off of this repo
+  - [ ] swap to the new image
+
+
+
+
+- [ ] use terraform to create cloudflare DNS entries
+- [ ] get production running off of this created docker image
 - [ ] get everything updated to the latest versions
   - [ ] psql 16
+  - [ ] docker images
 - [ ] re-deploy to production with these scripts
 - [ ] get rid of missinglink backend from the ansibl/packer images
 - [ ] move awardit to awardit.allistergrange.com
+
+- [ ] terraform for the dns's in cloudflare
 
 - [ ] set up alerting for missinglink
 - [ ] run everything under deployer (no grangeal)
@@ -137,6 +148,9 @@ k9s
   - [X] set up dns records for non-prod using route 53
   - [X] set up certificates
   
+- - [X] move backend.awardit.info to backed.missinglink.link
+  - [X] create A record in cloudflare
+
 - long term todos/clean ups
   - [ ] build a diagram to show what these scripts are doing, or just a list
   - [ ] clean up this README as a piece of documentation

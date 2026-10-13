@@ -1,6 +1,9 @@
 ### REDDIS ###
 - name: install Redis
-  ansible.builtin.command: apt-get install -y redis-server
+  ansible.builtin.apt:
+    name: redis-server
+    state: present
+    update_cache: yes
 
 - name: ensure Redis is running and enabled
   ansible.builtin.service:
@@ -9,8 +12,25 @@
     enabled: yes
 
 ### POSTGRES ###
-- name: install postgres
-  ansible.builtin.command: apt-get install -y postgresql-16
+- name: Add PostgreSQL APT repository key
+  ansible.builtin.apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add PostgreSQL repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+    state: present
+    filename: pgdg
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install PostgreSQL 18
+  ansible.builtin.apt:
+    name: postgresql-18
+    state: present
 
 - name: Find the path of pg_hba.conf
   ansible.builtin.command: sudo -u postgres psql -tAc "SHOW hba_file;"
@@ -20,10 +40,9 @@
 - name: Save and authorise the local connections
   ansible.builtin.lineinfile:
     path: "{{ hba_file.stdout | trim }}"
-    regexp: '^local\s+all\s+all\s+peer$'
+    regexp: '^local\s+all\s+all\s+peer\s*$'
     line: "local   all             all                                     trust"
     backup: yes
-  notify: reload postgresql
 
 - name: Authorise postgres user in local connections
   ansible.builtin.lineinfile:
@@ -31,7 +50,6 @@
     regexp: '^local\s+all\s+postgres\s+peer$'
     line: "local   all             postgres                                trust"
     backup: yes
-  notify: reload postgresql
 
 - name: Fetch the IP addresses of the server (used for configuring listen_addresses in postgresql.conf)
   ansible.builtin.setup:
@@ -40,19 +58,22 @@
 
 - name: Configurer listen_addresses in postgresql.conf
   ansible.builtin.lineinfile:
-    path: /etc/postgresql/16/main/postgresql.conf
+    path: /etc/postgresql/18/main/postgresql.conf
     regexp: '^#?\s*listen_addresses\s*='
-    line: "listen_addresses = 'localhost,{{ ansible_facts['ansible_eth0']['ipv4']['address'] }}'"
+    line: "listen_addresses = 'localhost,{{ ansible_facts['default_ipv4']['address'] }}'"
     backup: true
-  notify: Restart PostgreSQL
 
 - name: Configurer data_directory in postgresql.conf
   ansible.builtin.lineinfile:
-    path: /etc/postgresql/16/main/postgresql.conf
+    path: /etc/postgresql/18/main/postgresql.conf
     regexp: '^#?\s*data_directory\s*='
     line: "data_directory = '/mnt/volume_missinglink_db/main'"
     backup: true
-  notify: reload postgresql
+
+- name: Restart PostgreSQL after configuration changes
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
 
 # this is disabled in all productions that aren't 'prod' in
 - name: set up the cronjob to run the db backup once every 6 hours
@@ -61,9 +82,3 @@
     hour: "*/6"
     job: "sh {{ backup_script_dest_path }}/backup_db.sh"
     user: "root"
-
-handlers:
-  - name: reload postgresql
-    ansible.builtin.service:
-      name: postgresql
-      state: reloaded

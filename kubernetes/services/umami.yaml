@@ -16,7 +16,7 @@ metadata:
   name: postgres-service
 spec:
   type: ExternalName
-  externalName: data.missinglink.info
+  externalName: data.allistergrange.com
   ports:
     - protocol: TCP
       port: 2345

@@ -1,49 +1,111 @@
+load_module /usr/lib/nginx/modules/ngx_stream_ssl_module.so;
+
 events {
     worker_connections 1024;
 }
 
 http {
-  limit_req_zone $binary_remote_addr zone=one:10m rate=5r/s;
-  server_tokens  off;
+    limit_req_zone $binary_remote_addr zone=one:10m rate=5r/s;
+    server_tokens off;
 
-  sendfile on;
-  keepalive_timeout   30s;
-  client_body_timeout 10; client_header_timeout 10; send_timeout 10;
+    sendfile on;
 
-  proxy_set_header   Host $host;
-  proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header   X-Forwarded-Proto $scheme;
-  proxy_redirect off;
+    keepalive_timeout   30s;
+    client_body_timeout 10;
+    client_header_timeout 10;
+    send_timeout 10;
 
-  server {
-    server_name qa.backend.missinglink.link;
+    proxy_set_header   Host $host;
+    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_redirect off;
 
-    location /bushub {
-      proxy_pass http://127.0.0.1:5002;
-      proxy_set_header Connection "";
-      proxy_buffering off;
+
+    server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name backend.missinglink.link;
+
+        ssl_session_timeout 1d;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers off;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
+        ssl_stapling off;
+
+        location /bushub {
+            proxy_pass http://127.0.0.1:5002;
+            proxy_set_header Connection "";
+            proxy_buffering off;
+            keepalive_timeout 60s;
+        }
+
+        location / {
+            proxy_pass http://127.0.0.1:5002;
+        }
     }
 
-    location / {
-      proxy_pass http://127.0.0.1:5002;
-    }  
-  }
-    
-  server {
-    server_name               qa.backend.awardit.info;
+    server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name backend.awardit.info;
 
-    location / {
-      proxy_pass http://127.0.0.1:3001;
-    }
-  }
+        ssl_session_timeout 1d;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers off;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
+        ssl_stapling off;
 
-  server {
-   server_name qa.umami.startertab.com;
-  
-    location / {
-      proxy_pass http://localhost:3000;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        location / {
+            proxy_pass http://127.0.0.1:3001;
+        }
     }
+
+    server {
+        listen 443 ssl;
+        server_name umami.startertab.com;
+
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+}
+
+stream {
+    server {
+      listen 2345;
+
+      # cloudflare public ips
+      allow 173.245.48.0/20;
+      allow 103.21.244.0/22;
+      allow 103.22.200.0/22;
+      allow 103.31.4.0/22;
+      allow 141.101.64.0/18;
+      allow 108.162.192.0/18;
+      allow 190.93.240.0/20;
+      allow 188.114.96.0/20;
+      allow 197.234.240.0/22;
+      allow 198.41.128.0/17;
+      allow 162.158.0.0/15;
+      allow 104.16.0.0/13;
+      allow 104.24.0.0/14;
+      allow 172.64.0.0/13;
+      allow 131.0.72.0/22;
+      allow 2400:cb00::/32;
+      allow 2606:4700::/32;
+      allow 2803:f800::/32;
+      allow 2405:b500::/32;
+      allow 2405:8100::/32;
+      allow 2a06:98c0::/29;
+      allow 2c0f:f248::/32;
+
+      deny all;
+
+      proxy_connect_timeout 60s;
+      proxy_socket_keepalive on;
+      proxy_pass 127.0.0.1:5432; 
   }
 }

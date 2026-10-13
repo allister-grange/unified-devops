@@ -72,7 +72,7 @@ resource "digitalocean_volume" "missinglink_db_volume" {
   region                  = "syd1"
   name                    = "volume-missinglink-pg-db"
   initial_filesystem_type = "ext4"
-  size                    = 20
+  size                    = 40
 }
 
 resource "digitalocean_volume_attachment" "missinglink_db_volume_attachment" {

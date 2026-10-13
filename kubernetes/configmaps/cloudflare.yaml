@@ -12,10 +12,8 @@ data:
         service: http://startertab-service:3000
       - hostname: qa.startertab.com
         service: http://startertab-qa-service:3000
-      - hostname: umami.startertab.com
+      - hostname: umami.allistergrange.com
         service: http://umami-service:3000
       - hostname: backend.missinglink.link
         service: http://missinglink-api-service:5002
-      - hostname: backend.awardit.info
-        service: http://awardit-api-service:3001
       - service: http_status:404
