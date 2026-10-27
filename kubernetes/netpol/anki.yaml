@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: anki-allow-proxy-only
+spec:
+  # Restrict ingress to the Anki pod so only the nginx proxy can reach
+  # AnkiConnect (8765). Note: this is only enforced by a policy-capable CNI;
+  # OKE's default (flannel) CNI ignores NetworkPolicy, so the real guarantee is
+  # that anki-service is ClusterIP and nothing else routes to it.
+  podSelector:
+    matchLabels:
+      app: anki
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: anki-proxy
+      ports:
+        - protocol: TCP
+          port: 8765

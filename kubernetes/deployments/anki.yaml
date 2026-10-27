@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anki-deployment
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: anki
+  template:
+    metadata:
+      labels:
+        app: anki
+    spec:
+      # The image is multi-arch, but pin scheduling to the arm64 nodes this
+      # cluster actually runs so a stray amd64-only pull can never happen.
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: anki
+          # Headless AnkiConnect-compatible API (official `anki` library, no Qt/Xvfb).
+          # Pinned by digest for reproducibility; tag is `latest` upstream.
+          image: docker.io/glechic/anki-connect-server@sha256:2cd36bb7dab7a399379ff94b3085cf58e1a6bbccbb583cfe53c8941959b23259
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: anki-connect
+              containerPort: 8765
+          env:
+            # Collection (and its collection.media dir) lives on an emptyDir, so
+            # it is wiped on every restart and re-downloaded from AnkiWeb by the
+            # bootstrap-sync sidecar below.
+            - name: ANKICONNECT_COLLECTION_PATH
+              value: /data/collection.anki2
+            - name: ANKICONNECT_BIND
+              value: "0.0.0.0"
+            - name: ANKICONNECT_PORT
+              value: "8765"
+            - name: ANKICONNECT_ANKIWEB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: anki-secret
+                  key: ANKI_USERNAME
+            - name: ANKICONNECT_ANKIWEB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: anki-secret
+                  key: ANKI_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8765
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+
+        # One-shot pull from AnkiWeb on every pod start. The collection starts
+        # empty, so the sync resolves to a FULL_DOWNLOAD (the server disables
+        # full uploads by policy). Waits for the API, syncs once, then idles;
+        # re-runs automatically whenever the pod restarts. Read its logs with
+        # `kubectl logs deploy/anki-deployment -c bootstrap-sync`.
+        - name: bootstrap-sync
+          image: docker.io/curlimages/curl:8.10.1
+          command: ["sh", "-c"]
+          args:
+            - |
+              until curl -sf http://127.0.0.1:8765/health >/dev/null 2>&1; do sleep 2; done
+              echo "bootstrap: triggering startup sync (full download from AnkiWeb)"
+              curl -s -m 600 -H 'Content-Type: application/json' \
+                http://127.0.0.1:8765/ -d '{"action":"sync","version":6}' \
+                && echo "bootstrap: sync ok" || echo "bootstrap: sync FAILED"
+              while true; do sleep 3600; done
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "16Mi"
+            limits:
+              memory: "64Mi"
+      volumes:
+        - name: data
+          emptyDir: {}

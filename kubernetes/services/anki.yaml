@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: anki-service
+spec:
+  # ClusterIP only. AnkiConnect (8765) has no authentication, so it must not
+  # be exposed publicly. Public access is via the nginx proxy (basic auth) and
+  # the cloudflared tunnel (see kubernetes/anki/README.md).
+  type: ClusterIP
+  selector:
+    app: anki
+  ports:
+    - name: anki-connect
+      protocol: TCP
+      port: 8765
+      targetPort: 8765

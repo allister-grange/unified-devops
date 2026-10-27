@@ -16,4 +16,6 @@ data:
         service: http://umami-service:3000
       - hostname: backend.missinglink.link
         service: http://missinglink-api-service:5002
+      - hostname: anki-api.allistergrange.com
+        service: http://anki-proxy-service:80
       - service: http_status:404

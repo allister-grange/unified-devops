@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: anki-proxy-service
+spec:
+  # ClusterIP only; reached by the cloudflared tunnel, which owns public access.
+  type: ClusterIP
+  selector:
+    app: anki-proxy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
