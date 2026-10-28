@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: anki-sync-cron
+spec:
+  schedule: "*/1 * * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: sync
+              image: docker.io/curlimages/curl:8.10.1
+              command: ["sh", "-c"]
+              args:
+                - |
+                  set -e
+                  timeout 55 curl -s -X POST http://anki-service:8765/ -H 'Content-Type: application/json' -d '{"action":"sync","version":6}' || exit 1
